@@ -12,10 +12,14 @@
 
 class PoissonSolver {
 private:
-    int M, N;
     double x_min, x_max, y_min, y_max;
     double hx, hy, hx2, hy2, eps;
 
+    std::function<bool(double, double)> inside_region;
+    std::function<double(double, double)> source_func;
+
+protected:
+    int M, N;
     std::vector<std::vector<double>> u;   // solution
     std::vector<std::vector<double>> f;   // source term
     std::vector<std::vector<double>> r;   // residual
@@ -24,9 +28,6 @@ private:
     std::vector<std::vector<double>> p;   // conjugate direction
     std::vector<std::vector<double>> A_p; // A*p temporary
     std::vector<std::vector<double>> M_inv; 
-
-    std::function<bool(double, double)> inside_region;
-    std::function<double(double, double)> source_func;
 
 public:
     PoissonSolver(
@@ -59,7 +60,6 @@ public:
         
         initialize_f();
         initialize_k();
-        initialize_M_inv();
     }
 
     void initialize_f() {
@@ -99,7 +99,7 @@ public:
         }
     }
 
-    double compute_l2_norm() const {
+    virtual double compute_l2_norm() const {
         double sum = 0.0;
         #pragma omp parallel for reduction(+:sum) schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
@@ -138,7 +138,7 @@ public:
 
     void initialize_p() { p = z; }
 
-    double compute_alpha() const {
+    virtual double compute_alpha() const {
         double r_z = 0.0, p_A_p = 0.0;
         #pragma omp parallel for reduction(+:r_z,p_A_p) schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
@@ -149,7 +149,7 @@ public:
         return r_z / p_A_p;
     }
 
-    double compute_rz() const {
+    virtual double compute_rz() const {
         double rz = 0.0;
         #pragma omp parallel for reduction(+:rz) schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
@@ -186,26 +186,24 @@ public:
                 z[i][j] = M_inv[i][j] * r[i][j];
     }
 
-    void solve(int max_iter = 100000, double tolerance = 1e-6) {
+    virtual void solve(int max_iter = 100000, double tolerance = 1e-6) {
+        initialize_M_inv();
         initialize_r();
         apply_preconditioner();
         initialize_p();
 
         double rz_prev = compute_rz();
-
-        int iter;
         double r_norm = compute_l2_norm();
 
+        int iter;
         for (iter = 0; r_norm > tolerance && iter < max_iter; iter++) {
             apply_A(p, A_p);
 
             double alpha = compute_alpha();
-
             update_u(alpha);
             update_r(alpha);
 
             r_norm = compute_l2_norm();
-
             if (iter % 1000 == 0) {
                 std::ofstream debug_log("debug.log", std::ios::app);
                 debug_log << "Iter: " << iter / 1000 << "k, Residual Norm: " << r_norm << std::endl;
@@ -213,13 +211,9 @@ public:
 
             // z <- M^{-1} * r
             apply_preconditioner();
-
             double rz = compute_rz();
-
             double beta = rz / rz_prev;
-
             update_p(beta);
-
             rz_prev = rz;
         }
 
@@ -229,7 +223,7 @@ public:
             std::cout << "[OK] Converged in " << iter << " iterations, residual = " << r_norm << "\n";
     }
 
-    void save_to_file(const std::string& filename) const {
+    virtual void save_to_file(const std::string& filename) const {
         std::ofstream file(filename.c_str());
         if (!file.is_open()) {
             std::cerr << "Error: cannot open " << filename << "\n";
@@ -247,7 +241,9 @@ public:
         std::cout << "Saved solution to " << filename << "\n";
     }
 
-    const std::vector<std::vector<double>>& get_solution() const { return u; }
+    virtual const std::vector<std::vector<double>>& get_solution() const { return u; }
+
+    virtual ~PoissonSolver() = default;
 };
 
 #endif // CONJ_GRAD_HPP

@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <sys/time.h>
-#include "omp/conjugate_gradient.hpp"
+#include "bin/conjugate_gradient.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
