@@ -42,7 +42,7 @@ void save_to_file(std::vector<std::vector<double>> mat, std::string filename) {
         file << "\n";
     }
     file.close();
-    std::cout << "Saved solution to " << filename << "\n";
+    std::cout << "Saved solution to " << filename << std::endl << std::endl;
 }
 
 bool region(double x, double y) {
@@ -105,7 +105,7 @@ public:
     void print_info() const {
         std::cout << "==== Domain Decomposition Summary ====" << std::endl;
         std::cout << "Global grid: " << M << " x " << N << std::endl;
-        std::cout << "Total processes: " << P << "    Grid layout: " << px << " x " << py << "\n\n";
+        std::cout << "Total processes: " << P << "    Grid layout: " << px << " x " << py << std::endl;
 
         std::cout << "X partitions (" << px << "): ";
         for (int i = 0; i < px; ++i)
