@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <cstdlib>
 #include <sys/time.h>
 #include "bin/conjugate_gradient.hpp"
@@ -13,6 +12,27 @@ double getCurrentTime() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec + tv.tv_usec * 1e-6;
+}
+
+void save_to_file(std::vector<std::vector<double>> mat, std::string filename) {
+    std::ofstream file(filename.c_str());
+    if (!file.is_open()) {
+        std::cerr << "Error: cannot open " << filename << "\n";
+        return;
+    }
+
+    int M = mat.size() - 1;
+    int N = mat[0].size() - 1;
+
+    for (int i = 0; i <= M; ++i) {
+        for (int j = 0; j <= N; ++j) {
+            file << mat[i][j];
+            if (j < N) file << ",";
+        }
+        file << "\n";
+    }
+    file.close();
+    std::cout << "Saved solution to " << filename << "\n";
 }
 
 bool region(double x, double y) {
@@ -46,9 +66,8 @@ int main(int argc, char *argv[]) {
     
     std::cout << "Total time: " << getCurrentTime() - start << " seconds.\n";
     
-    std::string filename = "solution/solution_M_" + std::to_string(M) + 
-                          "_N_" + std::to_string(N) + ".csv";
-    solver.save_to_file(filename);
+    std::string filename = "solution/solution_M_" + std::to_string(M) + "_N_" + std::to_string(N) + ".csv";
+    save_to_file(solver.get_solution(), filename);
 
     return 0;
 }

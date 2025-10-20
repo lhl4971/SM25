@@ -223,24 +223,6 @@ public:
             std::cout << "[OK] Converged in " << iter << " iterations, residual = " << r_norm << "\n";
     }
 
-    virtual void save_to_file(const std::string& filename) const {
-        std::ofstream file(filename.c_str());
-        if (!file.is_open()) {
-            std::cerr << "Error: cannot open " << filename << "\n";
-            return;
-        }
-
-        for (int i = 0; i <= M; ++i) {
-            for (int j = 0; j <= N; ++j) {
-                file << u[i][j];
-                if (j < N) file << ",";
-            }
-            file << "\n";
-        }
-        file.close();
-        std::cout << "Saved solution to " << filename << "\n";
-    }
-
     virtual const std::vector<std::vector<double>>& get_solution() const { return u; }
 
     virtual ~PoissonSolver() = default;
