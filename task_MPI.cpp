@@ -7,7 +7,7 @@
 #include <vector>
 #include <cassert>
 #include <sys/time.h>
-#include "bin/mpi_conjugate_gradient.hpp"
+#include "include/mpi_conjugate_gradient.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>

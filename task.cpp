@@ -2,7 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <sys/time.h>
-#include "bin/conjugate_gradient.hpp"
+#include "include/conjugate_gradient.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>

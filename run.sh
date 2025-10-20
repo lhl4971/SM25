@@ -126,6 +126,8 @@ if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
     mpirun -np ${PROCS} ./task_mpi 800 1200
   done
 
+  # The HPC server only contains 19 physical cores, allowing MPI 
+  # to allocate logical cores when executing 32-process tasks.
   for PROCS in 32; do
     echo "---- MPI Processes: ${PROCS}, Grid: 800x1200 ----"
     mpirun --use-hwthread-cpus -np ${PROCS} ./task_mpi 800 1200
