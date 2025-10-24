@@ -132,7 +132,7 @@ public:
         return global_rz;
     }
 
-    void solve(int max_iter = 100000, double tolerance = 1e-6) override {
+    void solve(int max_iter = 100000, double tolerance = 1e-4) override {
         exchange_halo(k);
         initialize_M_inv();
 

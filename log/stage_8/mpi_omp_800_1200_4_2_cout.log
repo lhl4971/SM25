@@ -1,0 +1,55 @@
+Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1319159: <mpi_omp_800_1200_4_2> in cluster <MSUCluster> Done
+
+Job <mpi_omp_800_1200_4_2> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:19:31 2025
+Job was executed on host(s) <4*polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:19:33 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Wed Oct 22 05:19:33 2025
+Terminated at Wed Oct 22 05:23:41 2025
+Results reported at Wed Oct 22 05:23:41 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+OMP_NUM_THREADS=2 mpiexec ./task_mpi_omp 800 1200
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1976.30 sec.
+    Max Memory :                                 398 MB
+    Average Memory :                             387.55 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              7
+    Max Threads :                                28
+    Run time :                                   251 sec.
+    Turnaround time :                            250 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 4    Grid layout: 2 x 2
+X partitions (2):    0 400
+Y partitions (2):    0 600
+======================================
+[Rank  0] coords=(0,0) x:[   0, 399] y:[   0, 599] 
+[Rank  2] coords=(1,0) x:[ 400, 800] y:[   0, 599] 
+[Rank  1] coords=(0,1) x:[   0, 399] y:[ 600,1200] 
+[Rank  3] coords=(1,1) x:[ 400, 800] y:[ 600,1200] 
+[OK] Converged in 3756 iterations, residual = 9.82142e-05
+Total time: 246.903 seconds.
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+
+PS:
+
+Read file <log/stage_8/mpi_omp_800_1200_4_2_cerr.log> for stderr output of this job.
+

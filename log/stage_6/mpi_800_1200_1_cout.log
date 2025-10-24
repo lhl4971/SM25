@@ -1,0 +1,52 @@
+Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1319147: <mpi_800_1200_1> in cluster <MSUCluster> Done
+
+Job <mpi_800_1200_1> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:32:20 2025
+Job was executed on host(s) <polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:32:20 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Wed Oct 22 04:32:20 2025
+Terminated at Wed Oct 22 04:56:50 2025
+Results reported at Wed Oct 22 04:56:50 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+mpiexec ./task_mpi 800 1200
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1469.97 sec.
+    Max Memory :                                 159 MB
+    Average Memory :                             158.23 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                12
+    Run time :                                   1469 sec.
+    Turnaround time :                            1470 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 1    Grid layout: 1 x 1
+X partitions (1):    0
+Y partitions (1):    0
+======================================
+[Rank  0] coords=(0,0) x:[   0, 800] y:[   0,1200] 
+[OK] Converged in 3754 iterations, residual = 9.96783e-05
+Total time: 1468.37 seconds.
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+
+PS:
+
+Read file <log/stage_6/mpi_800_1200_1_cerr.log> for stderr output of this job.
+

@@ -186,7 +186,7 @@ public:
                 z[i][j] = M_inv[i][j] * r[i][j];
     }
 
-    virtual void solve(int max_iter = 100000, double tolerance = 1e-6) {
+    virtual void solve(int max_iter = 100000, double tolerance = 1e-4) {
         initialize_M_inv();
         initialize_r();
         apply_preconditioner();

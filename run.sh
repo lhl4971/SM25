@@ -10,11 +10,6 @@
 # ============================================================
 # Environment bootstrap (MPI setup)
 # ============================================================
-echo "[INFO] Purging all previously loaded modules..."
-module purge
-echo "[INFO] Loading OpenMPI/4.0.0 module..."
-module load OpenMPI/4.0.0
-ulimit -s 10240
 
 stage=1
 stop_stage=8
@@ -175,7 +170,5 @@ fi
 # ============================================================
 echo "======================================================"
 echo "[INFO] All experiment stages completed successfully."
-echo "[INFO] Unloading OpenMPI/4.0.0 module and cleaning environment..."
-module unload OpenMPI/4.0.0
 echo "[INFO] Done."
 echo "======================================================"

@@ -1,0 +1,44 @@
+Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1319133: <omp_400_600_16> in cluster <MSUCluster> Done
+
+Job <omp_400_600_16> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 03:48:18 2025
+Job was executed on host(s) <polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 03:48:19 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Wed Oct 22 03:48:19 2025
+Terminated at Wed Oct 22 03:48:36 2025
+Results reported at Wed Oct 22 03:48:36 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+OMP_NUM_THREADS=16 ./task_omp 400 600
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   248.23 sec.
+    Max Memory :                                 21 MB
+    Average Memory :                             17.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                19
+    Run time :                                   21 sec.
+    Turnaround time :                            18 sec.
+
+The output (if any) follows:
+
+[OK] Converged in 1812 iterations, residual = 9.97509e-05
+Total time: 16.9253 seconds.
+Saved solution to solution/solution_M_400_N_600.csv
+
+
+PS:
+
+Read file <log/stage_3/omp_400_600_16_cerr.log> for stderr output of this job.
+

@@ -1,0 +1,53 @@
+Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1319154: <mpi_omp_400_600_2_1> in cluster <MSUCluster> Done
+
+Job <mpi_omp_400_600_2_1> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:09:13 2025
+Job was executed on host(s) <2*polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:09:14 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Wed Oct 22 05:09:14 2025
+Terminated at Wed Oct 22 05:10:45 2025
+Results reported at Wed Oct 22 05:10:45 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+OMP_NUM_THREADS=1 mpiexec ./task_mpi_omp 400 600
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   179.55 sec.
+    Max Memory :                                 189 MB
+    Average Memory :                             176.47 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                16
+    Run time :                                   92 sec.
+    Turnaround time :                            92 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 400 x 600
+Total processes: 2    Grid layout: 1 x 2
+X partitions (1):    0
+Y partitions (2):    0 300
+======================================
+[Rank  1] coords=(0,1) x:[   0, 400] y:[ 300, 600] 
+[Rank  0] coords=(0,0) x:[   0, 400] y:[   0, 299] 
+[OK] Converged in 1812 iterations, residual = 9.97509e-05
+Total time: 89.5524 seconds.
+Saved solution to solution/solution_M_400_N_600.csv
+
+
+
+PS:
+
+Read file <log/stage_8/mpi_omp_400_600_2_1_cerr.log> for stderr output of this job.
+

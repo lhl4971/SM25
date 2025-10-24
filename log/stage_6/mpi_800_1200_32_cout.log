@@ -1,0 +1,84 @@
+Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1319151: <mpi_800_1200_32> in cluster <MSUCluster> Done
+
+Job <mpi_800_1200_32> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:08:12 2025
+Job was executed on host(s) <20*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:08:13 2025
+                            <12*polus-c2-ib.bmc.hpc.cs.msu.ru>
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Wed Oct 22 05:08:13 2025
+Terminated at Wed Oct 22 05:09:08 2025
+Results reported at Wed Oct 22 05:09:08 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+mpiexec ./task_mpi 800 1200
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1670.02 sec.
+    Max Memory :                                 3201 MB
+    Average Memory :                             2881.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              23
+    Max Threads :                                88
+    Run time :                                   56 sec.
+    Turnaround time :                            56 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 32    Grid layout: 4 x 8
+X partitions (4):    0 200 400 600
+Y partitions (8):    0 150 300 450 600 750 9001050
+======================================
+[Rank  0] coords=(0,0) x:[   0, 199] y:[   0, 149] 
+[Rank 27] coords=(3,3) x:[ 600, 800] y:[ 450, 599] 
+[Rank 26] coords=(3,2) x:[ 600, 800] y:[ 300, 449] 
+[Rank 23] coords=(2,7) x:[ 400, 599] y:[1050,1200] 
+[Rank 25] coords=(3,1) x:[ 600, 800] y:[ 150, 299] 
+[Rank 24] coords=(3,0) x:[ 600, 800] y:[   0, 149] 
+[Rank 22] coords=(2,6) x:[ 400, 599] y:[ 900,1049] 
+[Rank 21] coords=(2,5) x:[ 400, 599] y:[ 750, 899] 
+[Rank  1] coords=(0,1) x:[   0, 199] y:[ 150, 299] 
+[Rank  3] coords=(0,3) x:[   0, 199] y:[ 450, 599] 
+[Rank  2] coords=(0,2) x:[   0, 199] y:[ 300, 449] 
+[Rank  4] coords=(0,4) x:[   0, 199] y:[ 600, 749] 
+[Rank 16] coords=(2,0) x:[ 400, 599] y:[   0, 149] 
+[Rank 15] coords=(1,7) x:[ 200, 399] y:[1050,1200] 
+[Rank 17] coords=(2,1) x:[ 400, 599] y:[ 150, 299] 
+[Rank 14] coords=(1,6) x:[ 200, 399] y:[ 900,1049] 
+[Rank 18] coords=(2,2) x:[ 400, 599] y:[ 300, 449] 
+[Rank 11] coords=(1,3) x:[ 200, 399] y:[ 450, 599] 
+[Rank  5] coords=(0,5) x:[   0, 199] y:[ 750, 899] 
+[Rank 13] coords=(1,5) x:[ 200, 399] y:[ 750, 899] 
+[Rank  6] coords=(0,6) x:[   0, 199] y:[ 900,1049] 
+[Rank  7] coords=(0,7) x:[   0, 199] y:[1050,1200] 
+[Rank  9] coords=(1,1) x:[ 200, 399] y:[ 150, 299] 
+[Rank  8] coords=(1,0) x:[ 200, 399] y:[   0, 149] 
+[Rank 19] coords=(2,3) x:[ 400, 599] y:[ 450, 599] 
+[Rank 10] coords=(1,2) x:[ 200, 399] y:[ 300, 449] 
+[Rank 12] coords=(1,4) x:[ 200, 399] y:[ 600, 749] 
+[Rank 20] coords=(2,4) x:[ 400, 599] y:[ 600, 749] 
+[Rank 29] coords=(3,5) x:[ 600, 800] y:[ 750, 899] 
+[Rank 31] coords=(3,7) x:[ 600, 800] y:[1050,1200] 
+[Rank 30] coords=(3,6) x:[ 600, 800] y:[ 900,1049] 
+[Rank 28] coords=(3,4) x:[ 600, 800] y:[ 600, 749] 
+[OK] Converged in 3763 iterations, residual = 9.81248e-05
+Total time: 51.8997 seconds.
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+
+PS:
+
+Read file <log/stage_6/mpi_800_1200_32_cerr.log> for stderr output of this job.
+

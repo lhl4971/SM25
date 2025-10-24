@@ -1,0 +1,59 @@
+Sender: LSF System <lsfadmin@polus-c2-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1319145: <mpi_400_600_8> in cluster <MSUCluster> Done
+
+Job <mpi_400_600_8> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:31:38 2025
+Job was executed on host(s) <8*polus-c2-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:31:38 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Wed Oct 22 04:31:38 2025
+Terminated at Wed Oct 22 04:32:03 2025
+Results reported at Wed Oct 22 04:32:03 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+mpiexec ./task_mpi 400 600
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   188.83 sec.
+    Max Memory :                                 662 MB
+    Average Memory :                             551.83 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              11
+    Max Threads :                                40
+    Run time :                                   29 sec.
+    Turnaround time :                            25 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 400 x 600
+Total processes: 8    Grid layout: 2 x 4
+X partitions (2):    0 200
+Y partitions (4):    0 150 300 450
+======================================
+[Rank  0] coords=(0,0) x:[   0, 199] y:[   0, 149] 
+[Rank  3] coords=(0,3) x:[   0, 199] y:[ 450, 600] 
+[Rank  6] coords=(1,2) x:[ 200, 400] y:[ 300, 449] 
+[Rank  1] coords=(0,1) x:[   0, 199] y:[ 150, 299] 
+[Rank  2] coords=(0,2) x:[   0, 199] y:[ 300, 449] 
+[Rank  7] coords=(1,3) x:[ 200, 400] y:[ 450, 600] 
+[Rank  4] coords=(1,0) x:[ 200, 400] y:[   0, 149] 
+[Rank  5] coords=(1,1) x:[ 200, 400] y:[ 150, 299] 
+[OK] Converged in 1818 iterations, residual = 9.89925e-05
+Total time: 23.4544 seconds.
+Saved solution to solution/solution_M_400_N_600.csv
+
+
+
+PS:
+
+Read file <log/stage_6/mpi_400_600_8_cerr.log> for stderr output of this job.
+
