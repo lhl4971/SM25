@@ -1,0 +1,11 @@
+#BSUB -n 4
+#BSUB -W 30
+#BSUB -J "mpi_omp_800_1200_4_2"
+#BSUB -o "log/stage_8/mpi_omp_800_1200_4_2_cout.log"
+#BSUB -e "log/stage_8/mpi_omp_800_1200_4_2_cerr.log"
+
+export OMP_NUM_THREADS=2
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+
+mpiexec ./task_mpi_omp 800 1200

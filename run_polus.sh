@@ -249,16 +249,12 @@ if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
   mkdir -p log/stage_7
 
   for PROCS in 1 2; do
-    echo "---- Submitting hybrid job: MPI Processes=${PROCS}, OMP_THREADS=4, Grid=40x40 ----"
-
     JOB_NAME="mpi_omp_40_40_${PROCS}_4"
-    OUT_FILE="log/stage_7/${JOB_NAME}_cout.log"
-    ERR_FILE="log/stage_7/${JOB_NAME}_cerr.log"
+    LSF_FILE="config/stage_7/${JOB_NAME}.lsf"
 
-    JOB_ID=$(bsub -J "${JOB_NAME}" -n ${PROCS} -W 1 \
-         -oo "${OUT_FILE}" -eo "${ERR_FILE}" \
-         OMP_NUM_THREADS=4 mpiexec ./task_mpi_omp 40 40 | awk '{print $2}' | tr -d '<>')
+    echo "---- Submitting hybrid job via ${LSF_FILE} ----"
 
+    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
     echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
     bwait -w "ended(${JOB_ID})"
     echo "[INFO] Job ${JOB_ID} finished."
@@ -273,35 +269,27 @@ if [ ${stage} -le 8 ] && [ ${stop_stage} -ge 8 ]; then
 
   mkdir -p log/stage_8
 
-  # ---------- 400x600 ----------
+  # ---------- 400x600: 2 MPI процессов, 1/2/4/8 нитей ----------
   for THREADS in 1 2 4 8; do
-    echo "---- Submitting job: MPI=2, OMP_THREADS=${THREADS}, Grid=400x600 ----"
-
     JOB_NAME="mpi_omp_400_600_2_${THREADS}"
-    OUT_FILE="log/stage_8/${JOB_NAME}_cout.log"
-    ERR_FILE="log/stage_8/${JOB_NAME}_cerr.log"
+    LSF_FILE="config/stage_8/${JOB_NAME}.lsf"
 
-    JOB_ID=$(bsub -J "${JOB_NAME}" -n 2 -W 10 \
-         -oo "${OUT_FILE}" -eo "${ERR_FILE}" \
-         OMP_NUM_THREADS=${THREADS} mpiexec ./task_mpi_omp 400 600 | awk '{print $2}' | tr -d '<>')
+    echo "---- Submitting job via ${LSF_FILE} ----"
 
+    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
     echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
     bwait -w "ended(${JOB_ID})"
     echo "[INFO] Job ${JOB_ID} finished."
   done
 
-  # ---------- 800x1200 ----------
+  # ---------- 800x1200: 4 MPI процессов, 1/2/4/8 нитей ----------
   for THREADS in 1 2 4 8; do
-    echo "---- Submitting job: MPI=4, OMP_THREADS=${THREADS}, Grid=800x1200 ----"
-
     JOB_NAME="mpi_omp_800_1200_4_${THREADS}"
-    OUT_FILE="log/stage_8/${JOB_NAME}_cout.log"
-    ERR_FILE="log/stage_8/${JOB_NAME}_cerr.log"
+    LSF_FILE="config/stage_8/${JOB_NAME}.lsf"
 
-    JOB_ID=$(bsub -J "${JOB_NAME}" -n 4 -W 30 \
-         -oo "${OUT_FILE}" -eo "${ERR_FILE}" \
-         OMP_NUM_THREADS=${THREADS} mpiexec ./task_mpi_omp 800 1200 | awk '{print $2}' | tr -d '<>')
+    echo "---- Submitting job via ${LSF_FILE} ----"
 
+    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
     echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
     bwait -w "ended(${JOB_ID})"
     echo "[INFO] Job ${JOB_ID} finished."

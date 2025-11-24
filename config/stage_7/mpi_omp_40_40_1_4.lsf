@@ -1,0 +1,11 @@
+#BSUB -n 1
+#BSUB -W 1
+#BSUB -J "mpi_omp_40_40_1_4"
+#BSUB -o "log/stage_7/mpi_omp_40_40_1_4_cout.log"
+#BSUB -e "log/stage_7/mpi_omp_40_40_1_4_cerr.log"
+
+export OMP_NUM_THREADS=4
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+
+mpiexec ./task_mpi_omp 40 40
