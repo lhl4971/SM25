@@ -43,7 +43,9 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   echo "========== Stage 1: Sequential version =========="
 
   echo "[Compile] Building sequential version..."
-  g++ -o task_seq task.cpp -lm -std=c++11
+  g++ -o task_seq task.cpp \
+      src/conjugate_gradient.cpp \
+      -Iinclude -lm -std=c++11
   chmod u+x task_seq
 
   for M in 10 20 40; do
@@ -60,7 +62,9 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
   echo "========== Stage 2: OpenMP scalability test =========="
 
   echo "[Compile] Building OpenMP version..."
-  g++ -o task_omp task.cpp -lm -std=c++11 -fopenmp
+  g++ -o task_omp task.cpp \
+      src/conjugate_gradient.cpp \
+      -Iinclude -lm -std=c++11 -fopenmp
   chmod u+x task_omp
 
   for THREADS in 1 4 16; do
@@ -96,7 +100,10 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
   echo "=========== Stage 5: MPI scalability test ============"
 
   echo "[Compile] Building MPI version..."
-  mpicxx -o task_mpi task_MPI.cpp -lm -std=c++11
+  mpicxx -o task_mpi task_mpi.cpp \
+         src/conjugate_gradient.cpp \
+         src/mpi_conjugate_gradient.cpp \
+         -Iinclude -lm -std=c++11
   chmod u+x task_mpi
 
   for PROCS in 1 2 4; do
@@ -136,7 +143,10 @@ if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
   echo "======== Stage 7: MPI+OpenMP scalability test ========"
 
   echo "[Compile] Building MPI+OpenMP hybrid version..."
-  mpicxx -o task_mpi_omp task_MPI.cpp -lm -std=c++11 -fopenmp
+  mpicxx -o task_mpi_omp task_mpi.cpp \
+         src/conjugate_gradient.cpp \
+         src/mpi_conjugate_gradient.cpp \
+         -Iinclude -lm -std=c++11 -fopenmp
   chmod u+x task_mpi_omp
 
   export OMP_NUM_THREADS=4
