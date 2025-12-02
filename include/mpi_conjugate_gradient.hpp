@@ -3,6 +3,7 @@
 
 #include <mpi.h>
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <vector>
 #include "conjugate_gradient.hpp"
@@ -12,10 +13,15 @@
 #endif
 
 class MPIPoissonSolver : public PoissonSolver {
-private:
+protected:
     MPI_Comm cart_comm;
     int rank;
     int left_rank, right_rank, bottom_rank, top_rank;
+
+    std::vector<double> send_left, recv_left;
+    std::vector<double> send_right, recv_right;
+    std::vector<double> send_bottom, recv_bottom;
+    std::vector<double> send_top, recv_top;
 
 public:
     MPIPoissonSolver(
@@ -31,43 +37,47 @@ public:
         rank(world_rank),
         cart_comm(cart_comm_)
     {
+        send_left.assign(N + 1, 0.0);
+        recv_left.assign(N + 1, 0.0);
+        send_right.assign(N + 1, 0.0);
+        recv_right.assign(N + 1, 0.0);
+        send_bottom.assign(M + 1, 0.0);
+        recv_bottom.assign(M + 1, 0.0);
+        send_top.assign(M + 1, 0.0);
+        recv_top.assign(M + 1, 0.0);
+
         MPI_Cart_shift(cart_comm, 0, 1, &left_rank, &right_rank);
         MPI_Cart_shift(cart_comm, 1, 1, &bottom_rank, &top_rank);
 
     }
 
-    void exchange_halo(std::vector<std::vector<double>>& field) const {
-        std::vector<double> send_left(N+1), recv_left(N+1);
-        std::vector<double> send_right(N+1), recv_right(N+1);
-        std::vector<double> send_bottom(M+1), recv_bottom(M+1);
-        std::vector<double> send_top(M+1), recv_top(M+1);
-
+    void exchange_halo(std::vector<std::vector<double>>& field) {
         MPI_Request reqs[8];
         int rq = 0;
 
         if (left_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int j = 0; j <= N; ++j) send_left[j] = field[1][j];
             MPI_Irecv(recv_left.data(), N+1, MPI_DOUBLE, left_rank, 0, cart_comm, &reqs[rq++]);
             MPI_Isend(send_left.data(), N+1, MPI_DOUBLE, left_rank, 1, cart_comm, &reqs[rq++]);
         }
 
         if (right_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int j = 0; j <= N; ++j) send_right[j] = field[M-1][j];
             MPI_Irecv(recv_right.data(), N+1, MPI_DOUBLE, right_rank, 1, cart_comm, &reqs[rq++]);
             MPI_Isend(send_right.data(), N+1, MPI_DOUBLE, right_rank, 0, cart_comm, &reqs[rq++]);
         }
 
         if (bottom_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int i = 0; i <= M; ++i) send_bottom[i] = field[i][1];
             MPI_Irecv(recv_bottom.data(), M+1, MPI_DOUBLE, bottom_rank, 2, cart_comm, &reqs[rq++]);
             MPI_Isend(send_bottom.data(), M+1, MPI_DOUBLE, bottom_rank, 3, cart_comm, &reqs[rq++]);
         }
 
         if (top_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int i = 0; i <= M; ++i) send_top[i] = field[i][N-1];
             MPI_Irecv(recv_top.data(), M+1, MPI_DOUBLE, top_rank, 3, cart_comm, &reqs[rq++]);
             MPI_Isend(send_top.data(), M+1, MPI_DOUBLE, top_rank, 2, cart_comm, &reqs[rq++]);
@@ -76,19 +86,19 @@ public:
         MPI_Waitall(rq, reqs, MPI_STATUSES_IGNORE);
 
         if (left_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int j = 0; j <= N; ++j) field[0][j] = recv_left[j];
         }
         if (right_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int j = 0; j <= N; ++j) field[M][j] = recv_right[j];
         }
         if (bottom_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int i = 0; i <= M; ++i) field[i][0] = recv_bottom[i];
         }
         if (top_rank != MPI_PROC_NULL) {
-            #pragma omp parallel for schedule(static) collapse(1)
+            #pragma omp parallel for schedule(static)
             for (int i = 0; i <= M; ++i) field[i][N] = recv_top[i];
         }
     }
@@ -105,19 +115,16 @@ public:
         return std::sqrt(global_sum);
     }
 
-    double compute_alpha() const override {
-        double local_rz = 0.0, local_pAp = 0.0;
-        #pragma omp parallel for reduction(+:local_rz,local_pAp) collapse(2) schedule(static)
+    double compute_p_Ap() const override {
+        double local_p_Ap = 0.0;
+        #pragma omp parallel for reduction(+:local_p_Ap) collapse(2) schedule(static)
         for (int i = 1; i < M; ++i)
-            for (int j = 1; j < N; ++j) {
-                local_rz  += r[i][j] * z[i][j];
-                local_pAp += p[i][j] * A_p[i][j];
-            }
+            for (int j = 1; j < N; ++j)
+                local_p_Ap += p[i][j] * A_p[i][j];
 
-        double glob[2] = {0.0, 0.0};
-        double loc[2] = {local_rz, local_pAp};
-        MPI_Allreduce(loc, glob, 2, MPI_DOUBLE, MPI_SUM, cart_comm);
-        return glob[0] / glob[1];
+        double global_p_Ap = 0.0;
+        MPI_Allreduce(&local_p_Ap, &global_p_Ap, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+        return global_p_Ap;
     }
 
     double compute_rz() const override {
@@ -133,6 +140,9 @@ public:
     }
 
     void solve(int max_iter = 100000, double tolerance = 1e-4) override {
+        initialize_f();
+        initialize_k();
+
         exchange_halo(k);
         initialize_M_inv();
 
@@ -149,7 +159,8 @@ public:
             exchange_halo(p);
             apply_A(p, A_p);
 
-            double alpha = compute_alpha();
+            double p_Ap = compute_p_Ap();
+            double alpha = rz_prev / p_Ap;
             update_u(alpha);
             update_r(alpha);
 

@@ -13,13 +13,14 @@
 class PoissonSolver {
 private:
     double x_min, x_max, y_min, y_max;
-    double hx, hy, hx2, hy2, eps;
+    double hx, hy, eps;
 
     std::function<bool(double, double)> inside_region;
     std::function<double(double, double)> source_func;
 
 protected:
     int M, N;
+    double hx2, hy2;
     std::vector<std::vector<double>> u;   // solution
     std::vector<std::vector<double>> f;   // source term
     std::vector<std::vector<double>> r;   // residual
@@ -57,9 +58,6 @@ public:
         p.assign(M + 1, std::vector<double>(N + 1, 0.0));
         A_p.assign(M + 1, std::vector<double>(N + 1, 0.0));
         M_inv.assign(M + 1, std::vector<double>(N + 1, 1.0));
-        
-        initialize_f();
-        initialize_k();
     }
 
     void initialize_f() {
@@ -136,17 +134,15 @@ public:
                 r[i][j] = f[i][j] - A_u[i][j];
     }
 
-    void initialize_p() { p = z; }
+    virtual void initialize_p() { p = z; }
 
-    virtual double compute_alpha() const {
-        double r_z = 0.0, p_A_p = 0.0;
-        #pragma omp parallel for reduction(+:r_z,p_A_p) schedule(static) collapse(2)
+    virtual double compute_p_Ap() const {
+        double p_Ap = 0.0;
+        #pragma omp parallel for reduction(+:p_Ap) schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
-            for (int j = 1; j < N; ++j) {
-                r_z  += r[i][j] * z[i][j];
-                p_A_p += p[i][j] * A_p[i][j];
-            }
-        return r_z / p_A_p;
+            for (int j = 1; j < N; ++j)
+                p_Ap += p[i][j] * A_p[i][j];
+        return p_Ap;
     }
 
     virtual double compute_rz() const {
@@ -158,28 +154,28 @@ public:
         return rz;
     }
 
-    void update_u(double alpha) {
+    virtual void update_u(double alpha) {
         #pragma omp parallel for schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
             for (int j = 1; j < N; ++j)
                 u[i][j] += alpha * p[i][j];
     }
 
-    void update_r(double alpha) {
+    virtual void update_r(double alpha) {
         #pragma omp parallel for schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
             for (int j = 1; j < N; ++j)
                 r[i][j] -= alpha * A_p[i][j];
     }
 
-    void update_p(double beta) {
+    virtual void update_p(double beta) {
         #pragma omp parallel for schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
             for (int j = 1; j < N; ++j)
                 p[i][j] = z[i][j] + beta * p[i][j];
     }
 
-    void apply_preconditioner() {
+    virtual void apply_preconditioner() {
         #pragma omp parallel for schedule(static) collapse(2)
         for (int i = 1; i < M; ++i)
             for (int j = 1; j < N; ++j)
@@ -187,6 +183,8 @@ public:
     }
 
     virtual void solve(int max_iter = 100000, double tolerance = 1e-4) {
+        initialize_f();
+        initialize_k();
         initialize_M_inv();
         initialize_r();
         apply_preconditioner();
@@ -199,7 +197,8 @@ public:
         for (iter = 0; r_norm > tolerance && iter < max_iter; iter++) {
             apply_A(p, A_p);
 
-            double alpha = compute_alpha();
+            double p_Ap = compute_p_Ap();
+            double alpha = rz_prev / p_Ap;
             update_u(alpha);
             update_r(alpha);
 
