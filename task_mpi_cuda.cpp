@@ -7,6 +7,7 @@
 #include <vector>
 #include <cassert>
 #include <sys/time.h>
+#include <unistd.h>
 #include "include/mpi_cuda_conjugate_gradient.hpp"
 
 #define X_MIN 0.0
@@ -134,16 +135,34 @@ int main(int argc, char *argv[]) {
     }
 
     // Bind CUDA device to rank
+    MPI_Comm local_comm;
+    MPI_Comm_split_type(MPI_COMM_WORLD,
+                        MPI_COMM_TYPE_SHARED,
+                        0, MPI_INFO_NULL,
+                        &local_comm);
+
+    int local_rank = 0;
+    MPI_Comm_rank(local_comm, &local_rank);
+
     int dev_count = 0;
-    cudaGetDeviceCount(&dev_count);
-    if (dev_count > 0) {
-        int dev_id = world_rank % dev_count;
-        cudaSetDevice(dev_id);
-        // if (world_rank == 0) {
-        //     std::cout << "Using CUDA device " << dev_id
-        //               << " on rank " << world_rank << std::endl;
-        // }
+    cudaError_t cerr = cudaGetDeviceCount(&dev_count);
+    if (cerr != cudaSuccess || dev_count == 0) {
+        if (world_rank == 0) {
+            std::cerr << "[ERROR] No CUDA devices found on this node or cudaGetDeviceCount failed: "
+                    << cudaGetErrorString(cerr) << std::endl;
+        }
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
+    int dev_id = local_rank % dev_count;
+    cudaSetDevice(dev_id);
+
+    char hostname[256];
+    gethostname(hostname, sizeof(hostname));
+    std::cout << "[Rank " << world_rank << "] host=" << hostname
+              << " local_rank=" << local_rank << " dev=" << dev_id
+              << " dev_count=" << dev_count << std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Comm_free(&local_comm);
 
     int global_M = atoi(argv[1]);
     int global_N = atoi(argv[2]);

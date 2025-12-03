@@ -23,16 +23,18 @@ MPICudaPoissonSolver::MPICudaPoissonSolver(
 {
     size = (M + 1) * (N + 1);
     h_buf.resize(size);
+    h_partial.resize(NUM_PARTIALS);
     cudaStreamCreate(&stream);
 
-    cudaMalloc(&d_u,    size * sizeof(double));
-    cudaMalloc(&d_r,    size * sizeof(double));
-    cudaMalloc(&d_z,    size * sizeof(double));
-    cudaMalloc(&d_k,    size * sizeof(double));
-    cudaMalloc(&d_p,    size * sizeof(double));
-    cudaMalloc(&d_A_p,  size * sizeof(double));
-    cudaMalloc(&d_M_inv,size * sizeof(double));
-    cudaMalloc(&d_buf,  size * sizeof(double));
+    cudaMalloc(&d_u,       size * sizeof(double));
+    cudaMalloc(&d_r,       size * sizeof(double));
+    cudaMalloc(&d_z,       size * sizeof(double));
+    cudaMalloc(&d_k,       size * sizeof(double));
+    cudaMalloc(&d_p,       size * sizeof(double));
+    cudaMalloc(&d_A_p,     size * sizeof(double));
+    cudaMalloc(&d_M_inv,   size * sizeof(double));
+    cudaMalloc(&d_buf,     size * sizeof(double));
+    cudaMalloc(&d_partial, NUM_PARTIALS * sizeof(double));
     cuda_check_error("cudaMalloc in MPICudaPoissonSolver ctor");
 }
 
@@ -108,17 +110,19 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
 }
 
 double MPICudaPoissonSolver::compute_l2_norm() {
-    cuda_compute_r2(d_buf, d_r, M, N, stream);
+    // GPU partial pre-reduction
+    cuda_reduce_r2(d_partial, d_r, M, N, stream);
     cudaStreamSynchronize(stream);
 
-    cudaMemcpy(h_buf.data(), d_buf, size * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_partial.data(), d_partial, NUM_PARTIALS * sizeof(double), cudaMemcpyDeviceToHost);
     cuda_check_error("compute_l2_norm memcpy");
 
+    // CPU local post-reduction
     double local_sum = 0.0;
-    for (int i = 1; i < M; ++i)
-        for (int j = 1; j < N; ++j)
-            local_sum += h_buf[i * (N + 1) + j];
+    for (int i = 0; i < NUM_PARTIALS; i++)
+        local_sum += h_partial[i];
 
+    // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
 
@@ -130,17 +134,19 @@ void MPICudaPoissonSolver::initialize_p() {
 }
 
 double MPICudaPoissonSolver::compute_rz() {
-    cuda_compute_rz(d_buf, d_r, d_z, M, N, stream);
+    // GPU partial pre-reduction
+    cuda_reduce_rz(d_partial, d_r, d_z, M, N, stream);
     cudaStreamSynchronize(stream);
 
-    cudaMemcpy(h_buf.data(), d_buf, size * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_partial.data(), d_partial, NUM_PARTIALS * sizeof(double), cudaMemcpyDeviceToHost);
     cuda_check_error("compute_rz memcpy");
 
+    // CPU local post-reduction
     double local_sum = 0.0;
-    for (int i = 1; i < M; ++i)
-        for (int j = 1; j < N; ++j)
-            local_sum += h_buf[i * (N + 1) + j];
+    for (int i = 0; i < NUM_PARTIALS; i++)
+        local_sum += h_partial[i];
 
+    // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
 
@@ -148,17 +154,19 @@ double MPICudaPoissonSolver::compute_rz() {
 }
 
 double MPICudaPoissonSolver::compute_p_Ap() {
-    cuda_compute_p_Ap(d_buf, d_p, d_A_p, M, N, stream);
+    // GPU partial pre-reduction
+    cuda_reduce_p_Ap(d_partial, d_p, d_A_p, M, N, stream);
     cudaStreamSynchronize(stream);
 
-    cudaMemcpy(h_buf.data(), d_buf, size * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_partial.data(), d_partial, NUM_PARTIALS * sizeof(double), cudaMemcpyDeviceToHost);
     cuda_check_error("compute_p_Ap memcpy");
 
+    // CPU local post-reduction
     double local_sum = 0.0;
-    for (int i = 1; i < M; ++i)
-        for (int j = 1; j < N; ++j)
-            local_sum += h_buf[i * (N + 1) + j];
+    for (int i = 0; i < NUM_PARTIALS; i++)
+        local_sum += h_partial[i];
 
+    // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
 
@@ -242,14 +250,15 @@ void MPICudaPoissonSolver::solve(int max_iter, double tolerance) {
 }
 
 MPICudaPoissonSolver::~MPICudaPoissonSolver() {
-    if (d_u)     cudaFree(d_u);
-    if (d_r)     cudaFree(d_r);
-    if (d_z)     cudaFree(d_z);
-    if (d_k)     cudaFree(d_k);
-    if (d_p)     cudaFree(d_p);
-    if (d_A_p)   cudaFree(d_A_p);
-    if (d_M_inv) cudaFree(d_M_inv);
-    if (d_buf)   cudaFree(d_buf);
+    if (d_u)        cudaFree(d_u);
+    if (d_r)        cudaFree(d_r);
+    if (d_z)        cudaFree(d_z);
+    if (d_k)        cudaFree(d_k);
+    if (d_p)        cudaFree(d_p);
+    if (d_A_p)      cudaFree(d_A_p);
+    if (d_M_inv)    cudaFree(d_M_inv);
+    if (d_buf)      cudaFree(d_buf);
+    if (d_partial)  cudaFree(d_partial);
 
     cudaStreamDestroy(stream);
 }

@@ -20,7 +20,7 @@ void cuda_apply_A(const double *d_v,
                   double *d_out,
                   int M, int N,
                   double hx2, double hy2,
-                  cudaStream_t stream = 0)
+                  cudaStream_t stream)
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
@@ -36,7 +36,7 @@ void cuda_update_u(double *d_u,
                    const double *d_p,
                    double alpha,
                    int M, int N,
-                   cudaStream_t stream = 0)
+                   cudaStream_t stream)
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
@@ -52,7 +52,7 @@ void cuda_update_r(double *d_r,
                    const double *d_Ap,
                    double alpha,
                    int M, int N,
-                   cudaStream_t stream = 0)
+                   cudaStream_t stream)
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
@@ -68,7 +68,7 @@ void cuda_update_p(double *d_p,
                    const double *d_z,
                    double beta,
                    int M, int N,
-                   cudaStream_t stream = 0)
+                   cudaStream_t stream)
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
@@ -84,7 +84,7 @@ void cuda_apply_preconditioner(double *d_z,
                                const double *d_r,
                                const double *d_M_inv,
                                int M, int N,
-                               cudaStream_t stream = 0)
+                               cudaStream_t stream)
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
@@ -96,49 +96,34 @@ void cuda_apply_preconditioner(double *d_z,
     cuda_check_error("apply_preconditioner_kernel");
 }
 
-void cuda_compute_r2(double *d_buf,
-                     const double *d_r,
-                     int M, int N,
-                     cudaStream_t stream = 0)
+void cuda_reduce_r2(double *d_partial,
+                    const double *d_r,
+                    int M, int N,
+                    cudaStream_t stream)
 {
-    dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
-    dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
-    );
-
-    compute_r2_kernel<<<grid, block, 0, stream>>>(d_buf, d_r, M, N);
-    cuda_check_error("compute_r2_kernel");
+    int blocks = (NUM_PARTIALS + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    reduce_r2_kernel<<<blocks, THREADS_PER_BLOCK, 0, stream>>>(d_partial, d_r, M, N, NUM_PARTIALS);
+    cuda_check_error("reduce_r2_kernel");
 }
 
-void cuda_compute_p_Ap(double *d_buf,
+void cuda_reduce_p_Ap(double *d_partial,
                       const double *d_p,
-                      const double *d_Ap,
+                      const double *d_A_p,
                       int M, int N,
-                      cudaStream_t stream = 0)
+                      cudaStream_t stream)
 {
-    dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
-    dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
-    );
-
-    compute_p_Ap_kernel<<<grid, block, 0, stream>>>(d_buf, d_p, d_Ap, M, N);
-    cuda_check_error("compute_p_Ap_kernel");
+    int blocks = (NUM_PARTIALS + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    reduce_p_Ap_kernel<<<blocks, THREADS_PER_BLOCK, 0, stream>>>(d_partial, d_p, d_A_p, M, N, NUM_PARTIALS);
+    cuda_check_error("reduce_p_Ap_kernel");
 }
 
-void cuda_compute_rz(double *d_buf,
-                     const double *d_r,
-                     const double *d_z,
-                     int M, int N,
-                     cudaStream_t stream = 0)
+void cuda_reduce_rz(double *d_partial,
+                    const double *d_r,
+                    const double *d_z,
+                    int M, int N,
+                    cudaStream_t stream)
 {
-    dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
-    dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
-    );
-
-    compute_rz_kernel<<<grid, block, 0, stream>>>(d_buf, d_r, d_z, M, N);
-    cuda_check_error("compute_rz_kernel");
+    int blocks = (NUM_PARTIALS + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    reduce_rz_kernel<<<blocks, THREADS_PER_BLOCK, 0, stream>>>(d_partial, d_r, d_z, M, N, NUM_PARTIALS);
+    cuda_check_error("reduce_rz_kernel");
 }

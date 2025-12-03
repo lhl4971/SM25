@@ -20,9 +20,11 @@ private:
     double *d_A_p = nullptr;
     double *d_M_inv = nullptr;
     
-    // Device and host side buffer for reduction
+    // Device and host side buffer
     double *d_buf = nullptr;
+    double *d_partial = nullptr;
     std::vector<double> h_buf;
+    std::vector<double> h_partial;
 
     int size = 0;
     cudaStream_t stream = nullptr;

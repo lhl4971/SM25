@@ -90,37 +90,61 @@ void apply_preconditioner_kernel(double *z, const double *r, const double *M_inv
 }
 
 __global__
-void compute_r2_kernel(double *buf, const double *r, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    
-    if (i < 1 || i >= M) return;
-    if (j < 1 || j >= N) return;
+void reduce_r2_kernel(double *partial, const double *r, int M, int N, int num_partials) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid >= num_partials) return;
 
-    int id = idx(i, j, N + 1);
-    buf[id] = r[id] * r[id];
+    int total = (M + 1) * (N + 1);
+    double sum = 0.0;
+
+    for (int lin = tid; lin < total; lin += num_partials) {
+        int i = lin / (N + 1);
+        int j = lin % (N + 1);
+
+        if (i < 1 || i >= M) continue;
+        if (j < 1 || j >= N) continue;
+
+        sum += r[lin] * r[lin];
+    }
+    partial[tid] = sum;
 }
 
 __global__
-void compute_p_Ap_kernel(double *buf, const double *p, const double *A_p, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    
-    if (i < 1 || i >= M) return;
-    if (j < 1 || j >= N) return;
+void reduce_p_Ap_kernel(double *partial, const double *p, const double *A_p, int M, int N, int num_partials) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid >= num_partials) return;
 
-    int id = idx(i, j, N + 1);
-    buf[id] = p[id] * A_p[id];
+    int total = (M + 1) * (N + 1);
+    double sum = 0.0;
+
+    for (int lin = tid; lin < total; lin += num_partials) {
+        int i = lin / (N + 1);
+        int j = lin % (N + 1);
+
+        if (i < 1 || i >= M) continue;
+        if (j < 1 || j >= N) continue;
+
+        sum += p[lin] * A_p[lin];
+    }
+    partial[tid] = sum;
 }
 
 __global__
-void compute_rz_kernel(double *buf, const double *r, const double *z, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    
-    if (i < 1 || i >= M) return;
-    if (j < 1 || j >= N) return;
+void reduce_rz_kernel(double *partial, const double *r, const double *z, int M, int N, int num_partials) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid >= num_partials) return;
 
-    int id = idx(i, j, N + 1);
-    buf[id] = r[id] * z[id];
+    int total = (M + 1) * (N + 1);
+    double sum = 0.0;
+
+    for (int lin = tid; lin < total; lin += num_partials) {
+        int i = lin / (N + 1);
+        int j = lin % (N + 1);
+
+        if (i < 1 || i >= M) continue;
+        if (j < 1 || j >= N) continue;
+
+        sum += r[lin] * z[lin];
+    }
+    partial[tid] = sum;
 }
