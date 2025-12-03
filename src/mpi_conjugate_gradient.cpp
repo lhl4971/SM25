@@ -1,4 +1,5 @@
 #include "mpi_conjugate_gradient.hpp"
+#include "timer.hpp"
 
 MPIPoissonSolver::MPIPoissonSolver(
     int M, int N,
@@ -6,10 +7,11 @@ MPIPoissonSolver::MPIPoissonSolver(
     double y_min, double y_max,
     std::function<bool(double, double)> region_func,
     std::function<double(double, double)> f_func,
+    Timer &timer_,
     int world_rank,
     MPI_Comm cart_comm_
 ): 
-    PoissonSolver(M, N, x_min, x_max, y_min, y_max, region_func, f_func),
+    PoissonSolver(M, N, x_min, x_max, y_min, y_max, region_func, f_func, timer_),
     rank(world_rank),
     cart_comm(cart_comm_)
 {

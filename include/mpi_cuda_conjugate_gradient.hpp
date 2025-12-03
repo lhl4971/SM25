@@ -39,6 +39,7 @@ public:
         double y_min, double y_max,
         std::function<bool(double,double)> region_func,
         std::function<double(double,double)> f_func,
+        Timer &timer_,
         int world_rank,
         MPI_Comm cart_comm_
     );

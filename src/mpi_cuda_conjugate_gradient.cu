@@ -8,17 +8,19 @@
 #include "mpi_cuda_conjugate_gradient.hpp"
 #include "cuda_operators.hpp"
 
+
 MPICudaPoissonSolver::MPICudaPoissonSolver(
         int M_, int N_,
         double x_min, double x_max,
         double y_min, double y_max,
         std::function<bool(double, double)> region_func,
         std::function<double(double, double)> f_func,
+        Timer &timer_,
         int world_rank,
         MPI_Comm cart_comm_
     )
     : MPIPoissonSolver(M_, N_, x_min, x_max, y_min, y_max,
-                       region_func, f_func,
+                       region_func, f_func, timer_,
                        world_rank, cart_comm_)
 {
     size = (M + 1) * (N + 1);

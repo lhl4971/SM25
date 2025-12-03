@@ -1,17 +1,20 @@
 #include "conjugate_gradient.hpp"
+#include "timer.hpp"
 
 PoissonSolver::PoissonSolver(
     int M_, int N_,
     double x_min_, double x_max_,
     double y_min_, double y_max_,
     std::function<bool(double, double)> region_func,
-    std::function<double(double, double)> f_func
+    std::function<double(double, double)> f_func,
+    Timer &timer_
 ) :
     M(M_), N(N_),
     x_min(x_min_), x_max(x_max_),
     y_min(y_min_), y_max(y_max_),
     inside_region(region_func),
-    source_func(f_func)
+    source_func(f_func),
+    timer(timer_)
 {
     hx = (x_max - x_min) / M;
     hy = (y_max - y_min) / N;
@@ -77,7 +80,7 @@ double PoissonSolver::compute_l2_norm() {
 
 // A*v = -div(k grad(v))
 void PoissonSolver::apply_A(const std::vector<std::vector<double>>& v,
-                            std::vector<std::vector<double>>& out) const {
+                            std::vector<std::vector<double>>& out) {
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i) {
         for (int j = 1; j < N; ++j) {

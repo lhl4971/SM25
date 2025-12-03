@@ -9,17 +9,12 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "include/mpi_cuda_conjugate_gradient.hpp"
+#include "include/timer.hpp"
 
 #define X_MIN 0.0
 #define X_MAX 3.0
 #define Y_MIN 0.0
 #define Y_MAX 3.0
-
-double getCurrentTime() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + tv.tv_usec * 1e-6;
-}
 
 void save_to_file(std::vector<std::vector<double>> mat, std::string filename) {
     std::ofstream file(filename.c_str());
@@ -224,19 +219,21 @@ int main(int argc, char *argv[]) {
     double hx = (X_MAX - X_MIN) / global_M;
     double hy = (Y_MAX - Y_MIN) / global_N;
 
-    double start = getCurrentTime();
+    Timer timer;
+    timer.start("total_time");
 
     MPICudaPoissonSolver solver(
         x_end - x_start, y_end - y_start,
         X_MIN + hx * x_start, X_MIN + hx * x_end,
         Y_MIN + hy * y_start, Y_MIN + hy * y_end,
-        region, f_func,
+        region, f_func, timer,
         world_rank, cart_comm
     );
     solver.solve();
     
+    timer.stop("total_time");
     if (world_rank == 0)
-        std::cout << "Total time: " << getCurrentTime() - start << " seconds.\n";
+        std::cout << "Total time: " << timer.get("total_time") << " seconds.\n";
 
     struct Domain2D {
         int x_min, x_max, y_min, y_max, size;

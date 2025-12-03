@@ -3,16 +3,11 @@
 #include <cstdlib>
 #include <sys/time.h>
 #include "include/conjugate_gradient.hpp"
+#include "include/timer.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-
-double getCurrentTime() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + tv.tv_usec * 1e-6;
-}
 
 void save_to_file(std::vector<std::vector<double>> mat, std::string filename) {
     std::ofstream file(filename.c_str());
@@ -55,16 +50,18 @@ int main(int argc, char *argv[]) {
     std::ofstream debug_log("debug.log", std::ios::app);
     debug_log << "===== Test case M=" << M << ", N=" << N << " =====" << std::endl;
 
-    double start = getCurrentTime();
+    Timer timer;
+    timer.start("total_time");
 
     PoissonSolver solver(
         M, N,
         0.0, 3.0, 0.0, 3.0,
-        region, f_func
+        region, f_func, timer
     );
     solver.solve();
     
-    std::cout << "Total time: " << getCurrentTime() - start << " seconds.\n";
+    timer.stop("total_time");
+    std::cout << "Total time: " << timer.get("total_time") << " seconds.\n";
     
     std::string filename = "solution/solution_M_" + std::to_string(M) + "_N_" + std::to_string(N) + ".csv";
     save_to_file(solver.get_solution(), filename);

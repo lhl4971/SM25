@@ -11,6 +11,8 @@
 #include <omp.h>
 #endif
 
+class Timer;
+
 class PoissonSolver {
 private:
     double x_min, x_max, y_min, y_max;
@@ -30,6 +32,7 @@ protected:
     std::vector<std::vector<double>> p;   // conjugate direction
     std::vector<std::vector<double>> A_p; // A*p temporary
     std::vector<std::vector<double>> M_inv; 
+    Timer &timer;
 
 public:
     PoissonSolver(
@@ -37,7 +40,8 @@ public:
         double x_min_, double x_max_,
         double y_min_, double y_max_,
         std::function<bool(double, double)> region_func,
-        std::function<double(double, double)> f_func
+        std::function<double(double, double)> f_func,
+        Timer &timer_
     );
 
     void initialize_f();
@@ -48,7 +52,7 @@ public:
 
     // A*v = -div(k grad(v))
     void apply_A(const std::vector<std::vector<double>>& v,
-                 std::vector<std::vector<double>>& out) const;
+                 std::vector<std::vector<double>>& out);
 
     void initialize_r();
 

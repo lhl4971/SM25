@@ -9,8 +9,8 @@ MPI_INC_DIR := $(shell mpicc -show 2>/dev/null | sed -n 's/.*-I\([^ ]*\).*/\1/p'
 NVCC := $(CUDA_HOME)/bin/nvcc
 CXX  := mpicxx
 
-CXXFLAGS  := -std=c++11
-NVCCFLAGS := -std=c++11 -arch=$(ARCH) -Xcompiler "-fPIC"
+CXXFLAGS  := -std=c++11 -DPOISSON_SOLVER_CUDA_ENABLE
+NVCCFLAGS := -std=c++11 -arch=$(ARCH) -Xcompiler "-fPIC -DPOISSON_SOLVER_CUDA_ENABLE"
 
 INCLUDES  := -Iinclude -Isrc \
              -I/usr/lib/x86_64-linux-gnu/openmpi/include \
