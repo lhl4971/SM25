@@ -12,7 +12,7 @@
 # ============================================================
 
 stage=1
-stop_stage=8
+stop_stage=9
 
 # Parse optional arguments
 while [[ $# -gt 0 ]]; do
@@ -33,6 +33,8 @@ done
 
 mkdir -p solution
 echo "[INFO] Cleaning previous outputs..."
+make clean
+echo "[INFO] Cleaning previous builds..."
 rm -f debug.log
 rm -rf solution/*
 
@@ -172,6 +174,26 @@ if [ ${stage} -le 8 ] && [ ${stop_stage} -ge 8 ]; then
     echo "---- MPI Processes: 4, OMP Threads: ${THREADS}, Grid: 800x1200 ----"
     export OMP_NUM_THREADS=${THREADS}
     mpirun -np 4 ./task_mpi_omp 800 1200
+  done
+fi
+
+# ============================================================
+# Stage 9: MPI+CUDA GPU tests
+# ============================================================
+if [ ${stage} -le 9 ] && [ ${stop_stage} -ge 9 ]; then
+  echo "=============== Stage 9: MPI+CUDA test ==============="
+
+  echo "[Compile] Building MPI+CUDA version..."
+  make ARCH=sm_90
+
+  for PROCS in 1; do
+    echo "---- MPI Processes: ${PROCS}, Grid: 400x600 ----"
+    mpirun -np ${PROCS} ./task_mpi_cuda 400 600
+  done
+
+  for PROCS in 1; do
+    echo "---- MPI Processes: ${PROCS}, Grid: 800x1200 ----"
+    mpirun -np ${PROCS} ./task_mpi_cuda 800 1200
   done
 fi
 

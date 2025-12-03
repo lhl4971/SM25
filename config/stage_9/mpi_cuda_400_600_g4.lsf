@@ -1,0 +1,9 @@
+#BSUB -n 4
+#BSUB -W 5
+#BSUB -J "mpi_cuda_400_600_g4"
+#BSUB -oo "log/stage_9/mpi_cuda_400_600_g4_cout.log"
+#BSUB -eo "log/stage_9/mpi_cuda_400_600_g4_cerr.log"
+#BSUB -R "span[ptile=2]"
+#BSUB -gpu "num=2:mode=exclusive_process"
+
+mpiexec ./task_mpi_cuda 400 600

@@ -158,9 +158,15 @@ int main(int argc, char *argv[]) {
 
     char hostname[256];
     gethostname(hostname, sizeof(hostname));
-    std::cout << "[Rank " << world_rank << "] host=" << hostname
-              << " local_rank=" << local_rank << " dev=" << dev_id
-              << " dev_count=" << dev_count << std::endl;
+    std::ostringstream oss;
+    oss.str("");
+    oss << "[Rank " << world_rank << "] host=" << hostname
+        << " local_rank=" << local_rank << " dev=" << dev_id
+        << " dev_count=" << dev_count << std::endl;
+    for (int p = 0; p < world_size; ++p) {
+        MPI_Barrier(MPI_COMM_WORLD);
+        if (world_rank == p) std::cout << oss.str();
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Comm_free(&local_comm);
 
@@ -188,7 +194,7 @@ int main(int argc, char *argv[]) {
     y_start = part_y[coords[1]];
     y_end   = (coords[1] == dims[1] - 1) ? global_N : part_y[coords[1] + 1] - 1;
     
-    std::ostringstream oss;
+    oss.str("");
     oss << "[Rank " << std::setw(2) << world_rank << "] "
         << "coords=(" << coords[0] << "," << coords[1] << ") "
         << "x:[" << std::setw(4) << x_start << "," << std::setw(4) << x_end << "] "

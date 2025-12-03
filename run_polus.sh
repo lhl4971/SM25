@@ -17,7 +17,7 @@ module load OpenMPI/4.0.0
 ulimit -s 10240
 
 stage=1
-stop_stage=8
+stop_stage=9
 
 # Parse optional arguments
 while [[ $# -gt 0 ]]; do
@@ -39,6 +39,8 @@ done
 mkdir -p solution
 mkdir -p log
 echo "[INFO] Cleaning previous outputs..."
+make clean
+echo "[INFO] Cleaning previous builds..."
 rm -f debug.log
 rm -rf solution/*
 rm -rf log/*
@@ -226,7 +228,7 @@ if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
   done
 
   # ---------- 800x1200 ----------
-  for PROCS in 1 4 8 16 32; do
+  for PROCS in 1 2 4 8 16 32; do
     echo "---- Submitting job: MPI Processes=${PROCS}, Grid=800x1200 ----"
 
     JOB_NAME="mpi_800_1200_${PROCS}"
@@ -297,6 +299,40 @@ if [ ${stage} -le 8 ] && [ ${stop_stage} -ge 8 ]; then
     JOB_NAME="mpi_omp_800_1200_4_${THREADS}"
     LSF_FILE="config/stage_8/${JOB_NAME}.lsf"
 
+    echo "---- Submitting job via ${LSF_FILE} ----"
+
+    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
+    echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
+    bwait -w "ended(${JOB_ID})"
+    echo "[INFO] Job ${JOB_ID} finished."
+  done
+fi
+
+# ============================================================
+# Stage 9: MPI+CUDA GPU tests using pre-written LSF scripts
+# ============================================================
+if [ ${stage} -le 9 ] && [ ${stop_stage} -ge 9 ]; then
+  echo "=============== Stage 9: MPI+CUDA GPU test ==============="
+
+  mkdir -p log/stage_9
+
+  echo "[Compile] Building MPI+CUDA version..."
+  make ARCH=sm_60
+
+  for PROCS in 1 2 4; do
+    JOB_NAME="mpi_cuda_400_600_g${PROCS}"
+    LSF_FILE="config/stage_9/${JOB_NAME}.lsf"
+    echo "---- Submitting job via ${LSF_FILE} ----"
+
+    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
+    echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
+    bwait -w "ended(${JOB_ID})"
+    echo "[INFO] Job ${JOB_ID} finished."
+  done
+
+  for PROCS in 1 2 4; do
+    JOB_NAME="mpi_cuda_800_1200_g${PROCS}"
+    LSF_FILE="config/stage_9/${JOB_NAME}.lsf"
     echo "---- Submitting job via ${LSF_FILE} ----"
 
     JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
