@@ -40,23 +40,23 @@ void apply_preconditioner_kernel(double *z,
                                  int M, int N);
 
 __global__
-void reduce_r2_kernel(double *partial,
-                      const double *r,
-                      int M, int N,
-                      int num_partials);
+void compute_r2_kernel(double *buf,
+                       const double *r,
+                       int M, int N);
 
 __global__
-void reduce_p_Ap_kernel(double *partial,
-                        const double *p,
-                        const double *A_p,
-                        int M, int N,
-                        int num_partials);
+void compute_p_Ap_kernel(double *buf,
+                         const double *p,
+                         const double *A_p,
+                         int M, int N);
 
 __global__
-void reduce_rz_kernel(double *partial,
-                      const double *r,
-                      const double *z,
-                      int M, int N,
-                      int num_partials);
+void compute_rz_kernel(double *buf,
+                       const double *r,
+                       const double *z,
+                       int M, int N);
+
+__global__
+void reduce_pairwise_kernel(double *data, int n, int stride);
 
 #endif // CUDA_KERNELS_CUH

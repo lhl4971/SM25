@@ -7,6 +7,7 @@
 #include <cuda_runtime.h>
 #include "mpi_cuda_conjugate_gradient.hpp"
 #include "cuda_operators.hpp"
+#include "timer.hpp"
 
 
 MPICudaPoissonSolver::MPICudaPoissonSolver(
@@ -25,7 +26,6 @@ MPICudaPoissonSolver::MPICudaPoissonSolver(
 {
     size = (M + 1) * (N + 1);
     h_buf.resize(size);
-    h_partial.resize(NUM_PARTIALS);
     cudaStreamCreate(&stream);
 
     cudaMalloc(&d_u,       size * sizeof(double));
@@ -36,7 +36,6 @@ MPICudaPoissonSolver::MPICudaPoissonSolver(
     cudaMalloc(&d_A_p,     size * sizeof(double));
     cudaMalloc(&d_M_inv,   size * sizeof(double));
     cudaMalloc(&d_buf,     size * sizeof(double));
-    cudaMalloc(&d_partial, NUM_PARTIALS * sizeof(double));
     cuda_check_error("cudaMalloc in MPICudaPoissonSolver ctor");
 }
 
@@ -51,6 +50,7 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
     const size_t pitch     = row_bytes;
 
     cudaStreamSynchronize(stream);
+    timer.start("mem_to_host");
 
     if (left_rank != MPI_PROC_NULL) {
         cudaMemcpy(send_left.data(), d_field + idx(1, 0, Ny), row_bytes, cudaMemcpyDeviceToHost);
@@ -69,7 +69,9 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
     }
 
     cuda_check_error("cudaMemcpyDeviceToHost in cuda_exchange_halo");
+    timer.stop("mem_to_host");
 
+    timer.start("mpi_exchange_halo");
     if (left_rank != MPI_PROC_NULL) {
         MPI_Irecv(recv_left.data(), Ny, MPI_DOUBLE, left_rank, 0, cart_comm, &reqs[rq++]);
         MPI_Isend(send_left.data(), Ny, MPI_DOUBLE, left_rank, 1, cart_comm, &reqs[rq++]);
@@ -91,7 +93,9 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
     }
 
     MPI_Waitall(rq, reqs, MPI_STATUSES_IGNORE);
+    timer.stop("mpi_exchange_halo");
 
+    timer.start("mem_to_device");
     if (left_rank != MPI_PROC_NULL) {
         cudaMemcpy(d_field + idx(0, 0, Ny), recv_left.data(), row_bytes, cudaMemcpyHostToDevice);
     }
@@ -109,24 +113,38 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
     }
 
     cuda_check_error("cudaMemcpyHostToDevice in cuda_exchange_halo");
+    timer.stop("mem_to_device");
 }
 
 double MPICudaPoissonSolver::compute_l2_norm() {
     // GPU partial pre-reduction
-    cuda_reduce_r2(d_partial, d_r, M, N, stream);
+    timer.start("cuda_reduce");
+    cuda_compute_r2(d_buf, d_r, M, N, stream);
+    int total = (M + 1) * (N + 1);
+    int len_after = cuda_pairwise_reduce(d_buf, total, NUM_PARTIALS, stream);
     cudaStreamSynchronize(stream);
+    timer.stop("cuda_reduce");
 
-    cudaMemcpy(h_partial.data(), d_partial, NUM_PARTIALS * sizeof(double), cudaMemcpyDeviceToHost);
+    timer.start("mem_to_host");
+    if (h_partial.size() < len_after)
+        h_partial.resize(len_after);
+
+    cudaMemcpy(h_partial.data(), d_buf, len_after * sizeof(double), cudaMemcpyDeviceToHost);
     cuda_check_error("compute_l2_norm memcpy");
+    timer.stop("mem_to_host");
 
+    timer.start("reduction");
     // CPU local post-reduction
     double local_sum = 0.0;
-    for (int i = 0; i < NUM_PARTIALS; i++)
+    for (int i = 0; i < len_after; i++)
         local_sum += h_partial[i];
+    timer.stop("reduction");
 
+    timer.start("mpi_allreduce");
     // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+    timer.stop("mpi_allreduce");
 
     return std::sqrt(global_sum);
 }
@@ -137,61 +155,96 @@ void MPICudaPoissonSolver::initialize_p() {
 
 double MPICudaPoissonSolver::compute_rz() {
     // GPU partial pre-reduction
-    cuda_reduce_rz(d_partial, d_r, d_z, M, N, stream);
+    timer.start("cuda_reduce");
+    cuda_compute_rz(d_buf, d_r, d_z, M, N, stream);
+    int total = (M + 1) * (N + 1);
+    int len_after = cuda_pairwise_reduce(d_buf, total, NUM_PARTIALS, stream);
     cudaStreamSynchronize(stream);
+    timer.stop("cuda_reduce");
 
-    cudaMemcpy(h_partial.data(), d_partial, NUM_PARTIALS * sizeof(double), cudaMemcpyDeviceToHost);
-    cuda_check_error("compute_rz memcpy");
+    timer.start("mem_to_host");
+    if (h_partial.size() < len_after)
+        h_partial.resize(len_after);
 
+    cudaMemcpy(h_partial.data(), d_buf, len_after * sizeof(double), cudaMemcpyDeviceToHost);
+    cuda_check_error("compute_rz_norm memcpy");
+    timer.stop("mem_to_host");
+
+    timer.start("reduction");
     // CPU local post-reduction
     double local_sum = 0.0;
-    for (int i = 0; i < NUM_PARTIALS; i++)
+    for (int i = 0; i < len_after; i++)
         local_sum += h_partial[i];
+    timer.stop("reduction");
 
+    timer.start("mpi_allreduce");
     // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+    timer.stop("mpi_allreduce");
 
     return global_sum;
 }
 
 double MPICudaPoissonSolver::compute_p_Ap() {
     // GPU partial pre-reduction
-    cuda_reduce_p_Ap(d_partial, d_p, d_A_p, M, N, stream);
+    timer.start("cuda_reduce");
+    cuda_compute_p_Ap(d_buf, d_p, d_A_p, M, N, stream);
+    int total = (M + 1) * (N + 1);
+    int len_after = cuda_pairwise_reduce(d_buf, total, NUM_PARTIALS, stream);
     cudaStreamSynchronize(stream);
+    timer.stop("cuda_reduce");
 
-    cudaMemcpy(h_partial.data(), d_partial, NUM_PARTIALS * sizeof(double), cudaMemcpyDeviceToHost);
-    cuda_check_error("compute_p_Ap memcpy");
+    timer.start("mem_to_host");
+    if (h_partial.size() < len_after)
+        h_partial.resize(len_after);
 
+    cudaMemcpy(h_partial.data(), d_buf, len_after * sizeof(double), cudaMemcpyDeviceToHost);
+    cuda_check_error("compute_p_Ap_norm memcpy");
+    timer.stop("mem_to_host");
+
+    timer.start("reduction");
     // CPU local post-reduction
     double local_sum = 0.0;
-    for (int i = 0; i < NUM_PARTIALS; i++)
+    for (int i = 0; i < len_after; i++)
         local_sum += h_partial[i];
+    timer.stop("reduction");
 
+    timer.start("mpi_allreduce");
     // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+    timer.stop("mpi_allreduce");
 
     return global_sum;
 }
 
 void MPICudaPoissonSolver::update_u(double alpha) {
+    timer.start("cuda_update");
     cuda_update_u(d_u, d_p, alpha, M, N, stream);
+    timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::update_r(double alpha) {
+    timer.start("cuda_update");
     cuda_update_r(d_r, d_A_p, alpha, M, N, stream);
+    timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::update_p(double beta) {
+    timer.start("cuda_update");
     cuda_update_p(d_p, d_z, beta, M, N, stream);
+    timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::apply_preconditioner() {
+    timer.start("cuda_update");
     cuda_apply_preconditioner(d_z, d_r, d_M_inv, M, N, stream);
+    timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::solve(int max_iter, double tolerance) {
+    timer.start("init");
     initialize_f();
 
     initialize_k();
@@ -209,6 +262,7 @@ void MPICudaPoissonSolver::solve(int max_iter, double tolerance) {
 
     apply_preconditioner();
     initialize_p();
+    timer.stop("init");
 
     double rz_prev = compute_rz();
     double r_norm  = compute_l2_norm();
@@ -217,8 +271,10 @@ void MPICudaPoissonSolver::solve(int max_iter, double tolerance) {
     for (iter = 0; r_norm > tolerance && iter < max_iter; ++iter) {
         cuda_exchange_halo(d_p);
 
+        timer.start("cuda_laplace");
         cuda_apply_A(d_p, d_k, d_A_p, M, N, hx2, hy2, stream);
         cudaStreamSynchronize(stream);
+        timer.stop("cuda_laplace");
 
         double p_Ap = compute_p_Ap();
         double alpha = rz_prev / p_Ap;
@@ -274,9 +330,11 @@ void MPICudaPoissonSolver::to_device(const std::vector<std::vector<double>> &fie
     for (int i = 0; i < Nx; ++i)
         for (int j = 0; j < Ny; ++j)
             h_buf[i * Ny + j] = field[i][j];
-
+    
+    timer.start("mem_to_device");
     cudaMemcpy(d_field, h_buf.data(), size * sizeof(double), cudaMemcpyHostToDevice);
     cuda_check_error("to_device");
+    timer.stop("mem_to_device");
 }
 
 void MPICudaPoissonSolver::to_host(std::vector<std::vector<double>> &field, const double *d_field)
@@ -284,8 +342,10 @@ void MPICudaPoissonSolver::to_host(std::vector<std::vector<double>> &field, cons
     int Nx = M + 1;
     int Ny = N + 1;
 
+    timer.start("mem_to_host");
     cudaMemcpy(h_buf.data(), d_field, size * sizeof(double), cudaMemcpyDeviceToHost);
     cuda_check_error("to_host");
+    timer.stop("mem_to_host");
 
     for (int i = 0; i < Nx; ++i)
         for (int j = 0; j < Ny; ++j)

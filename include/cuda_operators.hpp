@@ -53,21 +53,25 @@ void cuda_apply_preconditioner(double *d_z,
                                int M, int N,
                                cudaStream_t stream = 0);
 
-void cuda_reduce_r2(double *d_partial,
-                    const double *d_r,
-                    int M, int N,
-                    cudaStream_t stream = 0);
+void cuda_compute_r2(double *d_buf,
+                     const double *d_r,
+                     int M, int N,
+                     cudaStream_t stream = 0);
 
-void cuda_reduce_p_Ap(double *d_partial,
-                      const double *d_p,
-                      const double *d_Ap,
-                      int M, int N,
-                      cudaStream_t stream = 0);
+void cuda_compute_p_Ap(double *d_buf,
+                       const double *d_p,
+                       const double *d_Ap,
+                       int M, int N,
+                       cudaStream_t stream = 0);
 
-void cuda_reduce_rz(double *d_partial,
-                    const double *d_r,
-                    const double *d_z,
-                    int M, int N,
-                    cudaStream_t stream = 0);
+void cuda_compute_rz(double *d_buf,
+                     const double *d_r,
+                     const double *d_z,
+                     int M, int N,
+                     cudaStream_t stream = 0);
+
+int cuda_pairwise_reduce(double *d_data,
+                         int n, int target_n,
+                         cudaStream_t stream = 0);
 
 #endif // CUDA_OPERATORS_HPP
