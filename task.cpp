@@ -39,6 +39,10 @@ double f_func(double x, double y) {
 }
 
 int main(int argc, char *argv[]) {
+    Timer timer;
+    timer.start("total_time");
+    timer.start("init");
+
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " M N" << std::endl;
         return 1;
@@ -50,21 +54,30 @@ int main(int argc, char *argv[]) {
     std::ofstream debug_log("debug.log", std::ios::app);
     debug_log << "===== Test case M=" << M << ", N=" << N << " =====" << std::endl;
 
-    Timer timer;
-    timer.start("total_time");
-
     PoissonSolver solver(
         M, N,
         0.0, 3.0, 0.0, 3.0,
         region, f_func, timer
     );
+    timer.stop("init");
     solver.solve();
-    
-    timer.stop("total_time");
-    std::cout << "Total time: " << timer.get("total_time") << " seconds.\n";
-    
+    timer.start("finalize");
+
     std::string filename = "solution/solution_M_" + std::to_string(M) + "_N_" + std::to_string(N) + ".csv";
     save_to_file(solver.get_solution(), filename);
+
+    timer.stop("finalize");
+    timer.stop("total_time");
+    
+    // Print timing summary
+    std::cout << "\n========== Timing Summary ==========\n";
+    std::cout << "Initialization time     : " << timer.get("init")      << " sec\n";
+    std::cout << "Laplace operator time   : " << timer.get("laplace")   << " sec\n";
+    std::cout << "Update operator time    : " << timer.get("update")    << " sec\n";
+    std::cout << "Reduction time          : " << timer.get("reduction") << " sec\n";
+    std::cout << "Finalize time           : " << timer.get("finalize")  << " sec\n";
+    std::cout << "Total runtime           : " << timer.get("total_time")<< " sec\n";
+    std::cout << "====================================\n\n";
 
     return 0;
 }

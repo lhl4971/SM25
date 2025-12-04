@@ -1,10 +1,10 @@
 #!/bin/bash
 # ============================================================
-# Poisson solver run script (sequential + OpenMP + MPI)
+# Poisson solver run script (sequential + OpenMP + MPI + CUDA)
 # Author: Hailin Liu
 # This script executes all experiment stages step-by-step.
 # Usage:
-#   ./run.sh --stage 1 --stop_stage 8
+#   ./run.sh --stage 1 --stop_stage 9
 # ============================================================
 
 # ============================================================

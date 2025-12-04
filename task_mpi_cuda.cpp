@@ -118,6 +118,10 @@ public:
 };
 
 int main(int argc, char *argv[]) {
+    Timer timer;
+    timer.start("total_time");
+    timer.start("init");
+
     MPI_Init(&argc, &argv);
     int world_size = 0, world_rank = 0;
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
@@ -219,9 +223,6 @@ int main(int argc, char *argv[]) {
     double hx = (X_MAX - X_MIN) / global_M;
     double hy = (Y_MAX - Y_MIN) / global_N;
 
-    Timer timer;
-    timer.start("total_time");
-
     MPICudaPoissonSolver solver(
         x_end - x_start, y_end - y_start,
         X_MIN + hx * x_start, X_MIN + hx * x_end,
@@ -229,11 +230,9 @@ int main(int argc, char *argv[]) {
         region, f_func, timer,
         world_rank, cart_comm
     );
+    timer.stop("init");
     solver.solve();
-    
-    timer.stop("total_time");
-    if (world_rank == 0)
-        std::cout << "Total time: " << timer.get("total_time") << " seconds.\n";
+    timer.start("finalize");
 
     struct Domain2D {
         int x_min, x_max, y_min, y_max, size;
@@ -286,7 +285,6 @@ int main(int argc, char *argv[]) {
             int nx = domain.x_max - domain.x_min + 1;
             int ny = domain.y_max - domain.y_min + 1;
 
-            #pragma omp parallel for schedule(static) collapse(2)
             for (int i = 0; i < nx; ++i)
                 for (int j = 0; j < ny; ++j)
                     U[domain.x_min + i][domain.y_min + j] = recv_buf[offset + i * ny + j];
@@ -296,6 +294,28 @@ int main(int argc, char *argv[]) {
 
         std::string filename = "solution/solution_M_" + std::to_string(global_M) + "_N_" + std::to_string(global_N) + ".csv";
         save_to_file(U, filename);
+    }
+
+    timer.stop("finalize");
+    timer.stop("total_time");
+
+    // Print timing summary
+    if (world_rank == 0) {
+        std::cout << "\n===== Timing Summary (rank 0, accumulated) =====\n";
+        std::cout << "Initialization time        = " << timer.get("init")           << " sec\n";
+        std::cout << "CPU Laplace operator time  = " << timer.get("laplace")        << " sec\n";
+        std::cout << "CPU update time            = " << timer.get("update")         << " sec\n";
+        std::cout << "CPU local reduction time   = " << timer.get("reduction")      << " sec\n";
+        std::cout << "CUDA Laplace operator time = " << timer.get("cuda_laplace")   << " sec\n";
+        std::cout << "CUDA update (kernels) time = " << timer.get("cuda_update")    << " sec\n";
+        std::cout << "CUDA reduction kernels time= " << timer.get("cuda_reduce")    << " sec\n";
+        std::cout << "Host->Device memcpy time   = " << timer.get("mem_to_device")  << " sec\n";
+        std::cout << "Device->Host memcpy time   = " << timer.get("mem_to_host")    << " sec\n";
+        std::cout << "MPI halo exchange time     = " << timer.get("mpi_exchange_halo") << " sec\n";
+        std::cout << "MPI Allreduce time         = " << timer.get("mpi_allreduce")  << " sec\n";
+        std::cout << "Finalize time              = " << timer.get("finalize")       << " sec\n";
+        std::cout << "Total runtime              = " << timer.get("total_time")     << " sec\n";
+        std::cout << "===============================================\n\n";
     }
 
     MPI_Finalize();

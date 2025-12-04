@@ -5,10 +5,6 @@
 #include <unordered_map>
 #include <string>
 
-#ifdef POISSON_SOLVER_CUDA_ENABLE
-#include <cuda_runtime.h>
-#endif
-
 class Timer {
 private:
     struct Record {
@@ -29,9 +25,6 @@ public:
     void start(const std::string &name) {
         Record &rec = timers[name];
         if (rec.running) return;
-#ifdef POISSON_SOLVER_CUDA_ENABLE
-        cudaDeviceSynchronize();
-#endif
         rec.start_t = std::chrono::high_resolution_clock::now();
         rec.running = true;
     }
@@ -39,9 +32,6 @@ public:
     void stop(const std::string &name) {
         Record &rec = timers[name];
         if (!rec.running) return;
-#ifdef POISSON_SOLVER_CUDA_ENABLE
-        cudaDeviceSynchronize();
-#endif
         auto end_t = std::chrono::high_resolution_clock::now();
         double dt = std::chrono::duration<double>(end_t - rec.start_t).count();
         rec.total += dt;

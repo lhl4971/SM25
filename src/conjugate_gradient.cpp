@@ -33,6 +33,7 @@ PoissonSolver::PoissonSolver(
 }
 
 void PoissonSolver::initialize_f() {
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 0; i <= M; ++i) {
         for (int j = 0; j <= N; ++j) {
@@ -41,9 +42,11 @@ void PoissonSolver::initialize_f() {
             f[i][j] = inside_region(x, y) ? source_func(x, y) : 0.0;
         }
     }
+    timer.stop("update");
 }
 
 void PoissonSolver::initialize_k() {
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 0; i <= M; ++i) {
         for (int j = 0; j <= N; ++j) {
@@ -52,9 +55,11 @@ void PoissonSolver::initialize_k() {
             k[i][j] = inside_region(x, y) ? 1.0 : 1 / eps;
         }
     }
+    timer.stop("update");
 }
 
 void PoissonSolver::initialize_M_inv() {
+    timer.start("laplace");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i) {
         for (int j = 1; j < N; ++j) {
@@ -67,20 +72,24 @@ void PoissonSolver::initialize_M_inv() {
             M_inv[i][j] = 1.0 / diag;
         }
     }
+    timer.stop("laplace");
 }
 
 double PoissonSolver::compute_l2_norm() {
+    timer.start("reduction");
     double sum = 0.0;
     #pragma omp parallel for reduction(+:sum) schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             sum += r[i][j] * r[i][j];
+    timer.stop("reduction");
     return std::sqrt(sum);
 }
 
 // A*v = -div(k grad(v))
 void PoissonSolver::apply_A(const std::vector<std::vector<double>>& v,
                             std::vector<std::vector<double>>& out) {
+    timer.start("laplace");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i) {
         for (int j = 1; j < N; ++j) {
@@ -95,15 +104,18 @@ void PoissonSolver::apply_A(const std::vector<std::vector<double>>& v,
             );
         }
     }
+    timer.stop("laplace");
 }
 
 void PoissonSolver::initialize_r() {
     std::vector<std::vector<double>> A_u(M + 1, std::vector<double>(N + 1, 0.0));
     apply_A(u, A_u);
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             r[i][j] = f[i][j] - A_u[i][j];
+    timer.stop("update");
 }
 
 void PoissonSolver::initialize_p() {
@@ -111,58 +123,72 @@ void PoissonSolver::initialize_p() {
 }
 
 double PoissonSolver::compute_p_Ap() {
+    timer.start("reduction");
     double p_Ap = 0.0;
     #pragma omp parallel for reduction(+:p_Ap) schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             p_Ap += p[i][j] * A_p[i][j];
+    timer.stop("reduction");
     return p_Ap;
 }
 
 double PoissonSolver::compute_rz() {
+    timer.start("reduction");
     double rz = 0.0;
     #pragma omp parallel for reduction(+:rz) schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             rz += r[i][j] * z[i][j];
+    timer.stop("reduction");
     return rz;
 }
 
 void PoissonSolver::update_u(double alpha) {
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             u[i][j] += alpha * p[i][j];
+    timer.stop("update");
 }
 
 void PoissonSolver::update_r(double alpha) {
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             r[i][j] -= alpha * A_p[i][j];
+    timer.stop("update");
 }
 
 void PoissonSolver::update_p(double beta) {
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             p[i][j] = z[i][j] + beta * p[i][j];
+    timer.stop("update");
 }
 
 void PoissonSolver::apply_preconditioner() {
+    timer.start("update");
     #pragma omp parallel for schedule(static) collapse(2)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             z[i][j] = M_inv[i][j] * r[i][j];
+    timer.stop("update");
 }
 
 void PoissonSolver::solve(int max_iter, double tolerance) {
+    timer.start("init");
     initialize_f();
     initialize_k();
     initialize_M_inv();
     initialize_r();
     apply_preconditioner();
     initialize_p();
+    timer.stop("init");
 
     double rz_prev = compute_rz();
     double r_norm = compute_l2_norm();

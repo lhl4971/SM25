@@ -29,6 +29,7 @@ MPIPoissonSolver::MPIPoissonSolver(
 }
 
 void MPIPoissonSolver::exchange_halo(std::vector<std::vector<double>>& field) {
+    timer.start("mpi_exchange_halo");
     MPI_Request reqs[8];
     int rq = 0;
 
@@ -78,45 +79,59 @@ void MPIPoissonSolver::exchange_halo(std::vector<std::vector<double>>& field) {
         #pragma omp parallel for schedule(static)
         for (int i = 0; i <= M; ++i) field[i][N] = recv_top[i];
     }
+    timer.stop("mpi_exchange_halo");
 }
 
 double MPIPoissonSolver::compute_l2_norm() {
+    timer.start("reduction");
     double local_sum = 0.0;
     #pragma omp parallel for reduction(+:local_sum) collapse(2) schedule(static)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             local_sum += r[i][j] * r[i][j];
+    timer.stop("reduction");
 
+    timer.start("mpi_allreduce");
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+    timer.stop("mpi_allreduce");
     return std::sqrt(global_sum);
 }
 
 double MPIPoissonSolver::compute_p_Ap() {
+    timer.start("reduction");
     double local_p_Ap = 0.0;
     #pragma omp parallel for reduction(+:local_p_Ap) collapse(2) schedule(static)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             local_p_Ap += p[i][j] * A_p[i][j];
+    timer.stop("reduction");
 
+    timer.start("mpi_allreduce");
     double global_p_Ap = 0.0;
     MPI_Allreduce(&local_p_Ap, &global_p_Ap, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+    timer.stop("mpi_allreduce");
     return global_p_Ap;
 }
 
 double MPIPoissonSolver::compute_rz() {
+    timer.start("reduction");
     double local_rz = 0.0;
     #pragma omp parallel for reduction(+:local_rz) collapse(2) schedule(static)
     for (int i = 1; i < M; ++i)
         for (int j = 1; j < N; ++j)
             local_rz += r[i][j] * z[i][j];
+    timer.stop("reduction");
 
+    timer.start("mpi_allreduce");
     double global_rz = 0.0;
     MPI_Allreduce(&local_rz, &global_rz, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
+    timer.stop("mpi_allreduce");
     return global_rz;
 }
 
 void MPIPoissonSolver::solve(int max_iter, double tolerance) {
+    timer.start("init");
     initialize_f();
     initialize_k();
 
@@ -127,6 +142,7 @@ void MPIPoissonSolver::solve(int max_iter, double tolerance) {
     initialize_r();
     apply_preconditioner();
     initialize_p();
+    timer.stop("init");
 
     double rz_prev = compute_rz();
     double r_norm = compute_l2_norm();
