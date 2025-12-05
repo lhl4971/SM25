@@ -1,0 +1,84 @@
+Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1406044: <mpi_cuda_800_1200_g4> in cluster <MSUCluster> Done
+
+Job <mpi_cuda_800_1200_g4> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 15:15:51 2025
+Job was executed on host(s) <2*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 15:15:56 2025
+                            <2*polus-c3-ib.bmc.hpc.cs.msu.ru>
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec  5 15:15:56 2025
+Terminated at Fri Dec  5 15:16:01 2025
+Results reported at Fri Dec  5 15:16:01 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -n 4
+#BSUB -W 30
+#BSUB -J "mpi_cuda_800_1200_g4"
+#BSUB -oo "log/stage_9/mpi_cuda_800_1200_g4_cout.log"
+#BSUB -eo "log/stage_9/mpi_cuda_800_1200_g4_cerr.log"
+#BSUB -R "span[ptile=2]"
+#BSUB -gpu "num=2:mode=exclusive_process"
+
+mpiexec ./task_mpi_cuda 800 1200
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   10.70 sec.
+    Max Memory :                                 441 MB
+    Average Memory :                             295.33 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              6
+    Max Threads :                                21
+    Run time :                                   11 sec.
+    Turnaround time :                            10 sec.
+
+The output (if any) follows:
+
+[Rank 0] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=2
+[Rank 2] host=polus-c3-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=2
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 4    Grid layout: 2 x 2
+X partitions (2):    0 400
+Y partitions (2):    0 600
+======================================
+[Rank 1] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=1 dev=1 dev_count=2
+[Rank 3] host=polus-c3-ib.bmc.hpc.cs.msu.ru local_rank=1 dev=1 dev_count=2
+[Rank  0] coords=(0,0) x:[   0, 399] y:[   0, 599] 
+[Rank  1] coords=(0,1) x:[   0, 399] y:[ 600,1200] 
+[Rank  3] coords=(1,1) x:[ 400, 800] y:[ 600,1200] 
+[Rank  2] coords=(1,0) x:[ 400, 800] y:[   0, 599] 
+[OK] Converged in 3756 iterations, residual = 9.82141e-05
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.387207 sec
+CPU Laplace operator time  = 0.0778614 sec
+CPU update time            = 0.0566024 sec
+CPU local reduction time   = 0.105958 sec
+CUDA Laplace operator time = 0.143649 sec
+CUDA update (kernels) time = 0.102111 sec
+CUDA reduction kernels time= 0.668887 sec
+Host->Device memcpy time   = 0.0704268 sec
+Device->Host memcpy time   = 0.244455 sec
+MPI halo exchange time     = 0.0684483 sec
+MPI Allreduce time         = 0.464817 sec
+Finalize time              = 0.651716 sec
+Total runtime              = 3.11734 sec
+===============================================
+
+
+
+PS:
+
+Read file <log/stage_9/mpi_cuda_800_1200_g4_cerr.log> for stderr output of this job.
+

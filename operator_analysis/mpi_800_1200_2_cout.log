@@ -1,0 +1,64 @@
+Sender: LSF System <lsfadmin@polus-c2-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1405972: <mpi_800_1200_2> in cluster <MSUCluster> Exited
+
+Job <mpi_800_1200_2> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 14:32:24 2025
+Job was executed on host(s) <2*polus-c2-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 14:32:24 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec  5 14:32:24 2025
+Terminated at Fri Dec  5 14:38:47 2025
+Results reported at Fri Dec  5 14:38:47 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+mpiexec ./task_mpi 800 1200
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   761.00 sec.
+    Max Memory :                                 238 MB
+    Average Memory :                             225.04 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                16
+    Run time :                                   385 sec.
+    Turnaround time :                            383 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 2    Grid layout: 1 x 2
+X partitions (1):    0
+Y partitions (2):    0 600
+======================================
+[Rank  0] coords=(0,0) x:[   0, 800] y:[   0, 599] 
+[Rank  1] coords=(0,1) x:[   0, 800] y:[ 600,1200] 
+[OK] Converged in 3754 iterations, residual = 9.96453e-05
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.521505 sec
+Laplace operator time      = 361.077 sec
+Update operator time       = 208.852 sec
+Local reduction time       = 129.228 sec
+MPI halo exchange time     = 0.277307 sec
+MPI Allreduce time         = 1.59433 sec
+Finalize                   = 0.667196 sec
+Total runtime              = 702.021 sec
+===============================================
+
+
+PS:
+
+Read file <log/stage_6/mpi_800_1200_2_cerr.log> for stderr output of this job.
+

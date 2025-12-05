@@ -1,0 +1,66 @@
+Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1405658: <mpi_400_600_4> in cluster <MSUCluster> Done
+
+Job <mpi_400_600_4> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 11:28:03 2025
+Job was executed on host(s) <4*polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 11:28:03 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec  5 11:28:03 2025
+Terminated at Fri Dec  5 11:28:47 2025
+Results reported at Fri Dec  5 11:28:47 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+mpiexec ./task_mpi 400 600
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   173.12 sec.
+    Max Memory :                                 347 MB
+    Average Memory :                             308.56 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              7
+    Max Threads :                                24
+    Run time :                                   44 sec.
+    Turnaround time :                            44 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 400 x 600
+Total processes: 4    Grid layout: 2 x 2
+X partitions (2):    0 200
+Y partitions (2):    0 300
+======================================
+[Rank  0] coords=(0,0) x:[   0, 199] y:[   0, 299] 
+[Rank  3] coords=(1,1) x:[ 200, 400] y:[ 300, 600] 
+[Rank  1] coords=(0,1) x:[   0, 199] y:[ 300, 600] 
+[Rank  2] coords=(1,0) x:[ 200, 400] y:[   0, 299] 
+[OK] Converged in 1818 iterations, residual = 9.89925e-05
+Saved solution to solution/solution_M_400_N_600.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.165407 sec
+Laplace operator time      = 22.0376 sec
+Update operator time       = 12.7557 sec
+Local reduction time       = 7.89385 sec
+MPI halo exchange time     = 0.0545919 sec
+MPI Allreduce time         = 0.356102 sec
+Finalize                   = 0.160746 sec
+Total runtime              = 43.4153 sec
+===============================================
+
+
+
+PS:
+
+Read file <log/stage_6/mpi_400_600_4_cerr.log> for stderr output of this job.
+

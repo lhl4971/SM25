@@ -1,0 +1,63 @@
+Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1405659: <mpi_800_1200_1> in cluster <MSUCluster> Done
+
+Job <mpi_800_1200_1> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 11:28:47 2025
+Job was executed on host(s) <polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 11:28:48 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec  5 11:28:48 2025
+Terminated at Fri Dec  5 11:52:15 2025
+Results reported at Fri Dec  5 11:52:15 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+mpiexec ./task_mpi 800 1200
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1405.96 sec.
+    Max Memory :                                 160 MB
+    Average Memory :                             159.18 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                12
+    Run time :                                   1406 sec.
+    Turnaround time :                            1408 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 1    Grid layout: 1 x 1
+X partitions (1):    0
+Y partitions (1):    0
+======================================
+[Rank  0] coords=(0,0) x:[   0, 800] y:[   0,1200] 
+[OK] Converged in 3754 iterations, residual = 9.96783e-05
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.673064 sec
+Laplace operator time      = 725.066 sec
+Update operator time       = 419.456 sec
+Local reduction time       = 259.51 sec
+MPI halo exchange time     = 0.00547432 sec
+MPI Allreduce time         = 0.0170259 sec
+Finalize                   = 0.646938 sec
+Total runtime              = 1404.92 sec
+===============================================
+
+
+
+PS:
+
+Read file <log/stage_6/mpi_800_1200_1_cerr.log> for stderr output of this job.
+

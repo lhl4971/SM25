@@ -1,0 +1,79 @@
+Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1406043: <mpi_cuda_800_1200_g2> in cluster <MSUCluster> Done
+
+Job <mpi_cuda_800_1200_g2> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 15:15:43 2025
+Job was executed on host(s) <2*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 15:15:44 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec  5 15:15:44 2025
+Terminated at Fri Dec  5 15:15:50 2025
+Results reported at Fri Dec  5 15:15:50 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -n 2
+#BSUB -W 30
+#BSUB -J "mpi_cuda_800_1200_g2"
+#BSUB -oo "log/stage_9/mpi_cuda_800_1200_g2_cout.log"
+#BSUB -eo "log/stage_9/mpi_cuda_800_1200_g2_cerr.log"
+#BSUB -R "span[ptile=2]"
+#BSUB -gpu "num=2:mode=exclusive_process"
+
+mpiexec ./task_mpi_cuda 800 1200
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   8.05 sec.
+    Max Memory :                                 265 MB
+    Average Memory :                             178.67 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              6
+    Max Threads :                                21
+    Run time :                                   5 sec.
+    Turnaround time :                            7 sec.
+
+The output (if any) follows:
+
+[Rank 0] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=2
+==== Domain Decomposition Summary ====
+Global grid: 800 x 1200
+Total processes: 2    Grid layout: 1 x 2
+X partitions (1):    0
+Y partitions (2):    0 600
+======================================
+[Rank 1] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=1 dev=1 dev_count=2
+[Rank  0] coords=(0,0) x:[   0, 800] y:[   0, 599] 
+[Rank  1] coords=(0,1) x:[   0, 800] y:[ 600,1200] 
+[OK] Converged in 3754 iterations, residual = 9.96439e-05
+Saved solution to solution/solution_M_800_N_1200.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.586579 sec
+CPU Laplace operator time  = 0.155973 sec
+CPU update time            = 0.110468 sec
+CPU local reduction time   = 0.106107 sec
+CUDA Laplace operator time = 0.255993 sec
+CUDA update (kernels) time = 0.101422 sec
+CUDA reduction kernels time= 1.23684 sec
+Host->Device memcpy time   = 0.0556936 sec
+Device->Host memcpy time   = 0.23619 sec
+MPI halo exchange time     = 0.156091 sec
+MPI Allreduce time         = 0.664901 sec
+Finalize time              = 0.647575 sec
+Total runtime              = 4.30657 sec
+===============================================
+
+
+
+PS:
+
+Read file <log/stage_9/mpi_cuda_800_1200_g2_cerr.log> for stderr output of this job.
+
