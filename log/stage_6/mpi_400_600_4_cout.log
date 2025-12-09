@@ -1,13 +1,13 @@
-Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
-Subject: Job 1319144: <mpi_400_600_4> in cluster <MSUCluster> Done
+Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1427086: <mpi_400_600_4> in cluster <MSUCluster> Done
 
-Job <mpi_400_600_4> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:30:50 2025
-Job was executed on host(s) <4*polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:30:51 2025
+Job <mpi_400_600_4> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 21:18:09 2025
+Job was executed on host(s) <4*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 21:18:09 2025
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
-Started at Wed Oct 22 04:30:51 2025
-Terminated at Wed Oct 22 04:31:38 2025
-Results reported at Wed Oct 22 04:31:38 2025
+Started at Mon Dec  8 21:18:09 2025
+Terminated at Mon Dec  8 21:18:12 2025
+Results reported at Mon Dec  8 21:18:12 2025
 
 Your job looked like:
 
@@ -20,16 +20,16 @@ Successfully completed.
 
 Resource usage summary:
 
-    CPU time :                                   182.27 sec.
+    CPU time :                                   9.21 sec.
     Max Memory :                                 347 MB
-    Average Memory :                             308.56 MB
+    Average Memory :                             231.67 MB
     Total Requested Memory :                     -
     Delta Memory :                               -
     Max Swap :                                   -
     Max Processes :                              7
     Max Threads :                                24
-    Run time :                                   48 sec.
-    Turnaround time :                            48 sec.
+    Run time :                                   9 sec.
+    Turnaround time :                            3 sec.
 
 The output (if any) follows:
 
@@ -39,13 +39,24 @@ Total processes: 4    Grid layout: 2 x 2
 X partitions (2):    0 200
 Y partitions (2):    0 300
 ======================================
+[Rank  2] coords=(1,0) x:[ 200, 400] y:[   0, 299] 
 [Rank  0] coords=(0,0) x:[   0, 199] y:[   0, 299] 
 [Rank  1] coords=(0,1) x:[   0, 199] y:[ 300, 600] 
 [Rank  3] coords=(1,1) x:[ 200, 400] y:[ 300, 600] 
-[Rank  2] coords=(1,0) x:[ 200, 400] y:[   0, 299] 
-[OK] Converged in 1818 iterations, residual = 9.89925e-05
-Total time: 45.4095 seconds.
+[OK] Converged in 1834 iterations, residual = 9.63968e-05
 Saved solution to solution/solution_M_400_N_600.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.129637 sec
+Laplace operator time      = 0.879627 sec
+Update operator time       = 0.500409 sec
+Local reduction time       = 0.691477 sec
+MPI halo exchange time     = 0.007924 sec
+MPI Allreduce time         = 0.0583736 sec
+Finalize                   = 0.159778 sec
+Total runtime              = 2.44147 sec
+===============================================
 
 
 

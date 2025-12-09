@@ -1,35 +1,45 @@
 Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
-Subject: Job 1319160: <mpi_omp_800_1200_4_4> in cluster <MSUCluster> Done
+Subject: Job 1427144: <mpi_omp_800_1200_4_4> in cluster <MSUCluster> Done
 
-Job <mpi_omp_800_1200_4_4> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:23:43 2025
-Job was executed on host(s) <4*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 05:23:44 2025
+Job <mpi_omp_800_1200_4_4> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 21:53:27 2025
+Job was executed on host(s) <4*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 21:53:33 2025
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
-Started at Wed Oct 22 05:23:44 2025
-Terminated at Wed Oct 22 05:26:52 2025
-Results reported at Wed Oct 22 05:26:52 2025
+Started at Mon Dec  8 21:53:33 2025
+Terminated at Mon Dec  8 21:55:14 2025
+Results reported at Mon Dec  8 21:55:14 2025
 
 Your job looked like:
 
 ------------------------------------------------------------
 # LSBATCH: User input
-OMP_NUM_THREADS=4 mpiexec ./task_mpi_omp 800 1200
+#BSUB -n 4
+#BSUB -W 30
+#BSUB -J "mpi_omp_800_1200_4_4"
+#BSUB -o "log/stage_8/mpi_omp_800_1200_4_4_cout.log"
+#BSUB -e "log/stage_8/mpi_omp_800_1200_4_4_cerr.log"
+
+export OMP_NUM_THREADS=4
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+
+mpiexec ./task_mpi_omp 800 1200
 ------------------------------------------------------------
 
 Successfully completed.
 
 Resource usage summary:
 
-    CPU time :                                   2983.99 sec.
-    Max Memory :                                 398 MB
-    Average Memory :                             384.31 MB
+    CPU time :                                   801.23 sec.
+    Max Memory :                                 421 MB
+    Average Memory :                             377.69 MB
     Total Requested Memory :                     -
     Delta Memory :                               -
     Max Swap :                                   -
-    Max Processes :                              7
-    Max Threads :                                36
-    Run time :                                   193 sec.
-    Turnaround time :                            189 sec.
+    Max Processes :                              8
+    Max Threads :                                37
+    Run time :                                   102 sec.
+    Turnaround time :                            107 sec.
 
 The output (if any) follows:
 
@@ -39,13 +49,24 @@ Total processes: 4    Grid layout: 2 x 2
 X partitions (2):    0 400
 Y partitions (2):    0 600
 ======================================
-[Rank  0] coords=(0,0) x:[   0, 399] y:[   0, 599] 
-[Rank  2] coords=(1,0) x:[ 400, 800] y:[   0, 599] 
-[Rank  1] coords=(0,1) x:[   0, 399] y:[ 600,1200] 
 [Rank  3] coords=(1,1) x:[ 400, 800] y:[ 600,1200] 
-[OK] Converged in 3756 iterations, residual = 9.82141e-05
-Total time: 186.469 seconds.
+[Rank  2] coords=(1,0) x:[ 400, 800] y:[   0, 599] 
+[Rank  0] coords=(0,0) x:[   0, 399] y:[   0, 599] 
+[Rank  1] coords=(0,1) x:[   0, 399] y:[ 600,1200] 
+[OK] Converged in 3737 iterations, residual = 9.88798e-05
 Saved solution to solution/solution_M_800_N_1200.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.289676 sec
+Laplace operator time      = 6.89608 sec
+Update operator time       = 3.0338 sec
+Local reduction time       = 1.72646 sec
+MPI halo exchange time     = 0.0712261 sec
+MPI Allreduce time         = 0.201722 sec
+Finalize                   = 0.566557 sec
+Total runtime              = 12.8286 sec
+===============================================
 
 
 

@@ -3,7 +3,7 @@
 #include "cuda_operators.hpp"
 #include "cuda_kernels.cuh"
 
-inline void cuda_check_error(const char *msg)
+void cuda_check_error(const char *msg)
 {
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)

@@ -1,13 +1,13 @@
 Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
-Subject: Job 1406047: <mpi_cuda_400_600_g2> in cluster <MSUCluster> Done
+Subject: Job 1427185: <mpi_cuda_400_600_g2> in cluster <MSUCluster> Done
 
-Job <mpi_cuda_400_600_g2> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 15:21:29 2025
-Job was executed on host(s) <2*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec  5 15:21:29 2025
+Job <mpi_cuda_400_600_g2> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 22:14:48 2025
+Job was executed on host(s) <2*polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 22:14:48 2025
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
-Started at Fri Dec  5 15:21:29 2025
-Terminated at Fri Dec  5 15:21:31 2025
-Results reported at Fri Dec  5 15:21:31 2025
+Started at Mon Dec  8 22:14:48 2025
+Terminated at Mon Dec  8 22:14:50 2025
+Results reported at Mon Dec  8 22:14:50 2025
 
 Your job looked like:
 
@@ -28,21 +28,21 @@ Successfully completed.
 
 Resource usage summary:
 
-    CPU time :                                   2.13 sec.
-    Max Memory :                                 215 MB
-    Average Memory :                             143.67 MB
+    CPU time :                                   2.26 sec.
+    Max Memory :                                 216 MB
+    Average Memory :                             145.33 MB
     Total Requested Memory :                     -
     Delta Memory :                               -
     Max Swap :                                   -
     Max Processes :                              6
     Max Threads :                                21
-    Run time :                                   6 sec.
+    Run time :                                   2 sec.
     Turnaround time :                            2 sec.
 
 The output (if any) follows:
 
-[Rank 1] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=1 dev=1 dev_count=2
 [Rank 0] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=2
+[Rank 1] host=polus-c4-ib.bmc.hpc.cs.msu.ru local_rank=1 dev=1 dev_count=2
 ==== Domain Decomposition Summary ====
 Global grid: 400 x 600
 Total processes: 2    Grid layout: 1 x 2
@@ -51,24 +51,24 @@ Y partitions (2):    0 300
 ======================================
 [Rank  0] coords=(0,0) x:[   0, 400] y:[   0, 299] 
 [Rank  1] coords=(0,1) x:[   0, 400] y:[ 300, 600] 
-[OK] Converged in 1812 iterations, residual = 9.97509e-05
+[OK] Converged in 1834 iterations, residual = 9.63968e-05
 Saved solution to solution/solution_M_400_N_600.csv
 
 
 ===== Timing Summary (rank 0, accumulated) =====
-Initialization time        = 0.268991 sec
-CPU Laplace operator time  = 0.03852 sec
-CPU update time            = 0.0275228 sec
-CPU local reduction time   = 0.0506014 sec
-CUDA Laplace operator time = 0.0460004 sec
-CUDA update (kernels) time = 0.0481774 sec
-CUDA reduction kernels time= 0.22139 sec
-Host->Device memcpy time   = 0.0218842 sec
-Device->Host memcpy time   = 0.099477 sec
-MPI halo exchange time     = 0.0161393 sec
-MPI Allreduce time         = 0.100162 sec
-Finalize time              = 0.172754 sec
-Total runtime              = 1.12981 sec
+Initialization time        = 0.226652 sec
+CPU Laplace operator time  = 0.00348284 sec
+CPU update time            = 0.00500014 sec
+CPU local reduction time   = 0.0220089 sec
+CUDA Laplace operator time = 0.0505124 sec
+CUDA update (kernels) time = 0.0696727 sec
+CUDA reduction kernels time= 0.304562 sec
+Host->Device memcpy time   = 0.0317141 sec
+Device->Host memcpy time   = 0.132896 sec
+MPI halo exchange time     = 0.00832334 sec
+MPI Allreduce time         = 0.0311805 sec
+Finalize time              = 0.234751 sec
+Total runtime              = 1.22289 sec
 ===============================================
 
 

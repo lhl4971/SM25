@@ -1,13 +1,13 @@
 Sender: LSF System <lsfadmin@polus-c4-ib.bmc.hpc.cs.msu.ru>
-Subject: Job 1319137: <omp_800_1200_16> in cluster <MSUCluster> Done
+Subject: Job 1427077: <omp_800_1200_16> in cluster <MSUCluster> Done
 
-Job <omp_800_1200_16> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:22:45 2025
-Job was executed on host(s) <polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Wed Oct 22 04:22:46 2025
+Job <omp_800_1200_16> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 21:17:10 2025
+Job was executed on host(s) <polus-c4-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 21:17:10 2025
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
-Started at Wed Oct 22 04:22:46 2025
-Terminated at Wed Oct 22 04:24:59 2025
-Results reported at Wed Oct 22 04:24:59 2025
+Started at Mon Dec  8 21:17:10 2025
+Terminated at Mon Dec  8 21:17:23 2025
+Results reported at Mon Dec  8 21:17:23 2025
 
 Your job looked like:
 
@@ -20,22 +20,31 @@ Successfully completed.
 
 Resource usage summary:
 
-    CPU time :                                   1762.76 sec.
+    CPU time :                                   178.86 sec.
     Max Memory :                                 65 MB
-    Average Memory :                             61.95 MB
+    Average Memory :                             49.00 MB
     Total Requested Memory :                     -
     Delta Memory :                               -
     Max Swap :                                   -
     Max Processes :                              3
     Max Threads :                                19
-    Run time :                                   137 sec.
-    Turnaround time :                            134 sec.
+    Run time :                                   13 sec.
+    Turnaround time :                            13 sec.
 
 The output (if any) follows:
 
-[OK] Converged in 3754 iterations, residual = 9.96439e-05
-Total time: 131.231 seconds.
+[OK] Converged in 3759 iterations, residual = 9.871e-05
 Saved solution to solution/solution_M_800_N_1200.csv
+
+========== Timing Summary ==========
+Initialization time     : 0.0123926 sec
+Laplace operator time   : 3.48103 sec
+Update operator time    : 1.79437 sec
+Reduction time          : 1.24019 sec
+Finalize time           : 0.535841 sec
+Total runtime           : 7.08205 sec
+====================================
+
 
 
 PS:

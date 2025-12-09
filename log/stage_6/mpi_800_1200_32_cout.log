@@ -72,9 +72,20 @@ Y partitions (8):    0 150 300 450 600 750 9001050
 [Rank 31] coords=(3,7) x:[ 600, 800] y:[1050,1200] 
 [Rank 30] coords=(3,6) x:[ 600, 800] y:[ 900,1049] 
 [Rank 28] coords=(3,4) x:[ 600, 800] y:[ 600, 749] 
-[OK] Converged in 3763 iterations, residual = 9.81248e-05
-Total time: 51.8997 seconds.
+[OK] Converged in 3759 iterations, residual = 9.91981e-05
 Saved solution to solution/solution_M_800_N_1200.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.561032 sec
+Laplace operator time      = 1.98824 sec
+Update operator time       = 0.95078 sec
+Local reduction time       = 0.594175 sec
+MPI halo exchange time     = 0.0349678 sec
+MPI Allreduce time         = 0.191037 sec
+Finalize                   = 0.563394 sec
+Total runtime              = 4.91637 sec
+===============================================
 
 
 
