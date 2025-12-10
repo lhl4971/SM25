@@ -7,6 +7,7 @@
 #include <vector>
 #include <cassert>
 #include <sys/time.h>
+#include <limits>
 #include <unistd.h>
 #include "include/mpi_cuda_conjugate_gradient.hpp"
 #include "include/timer.hpp"
@@ -54,30 +55,63 @@ private:
     std::vector<int> part_y;
 
 public:
-    DomainDecomposer(
-        int M_, int N_, int P_
-    ): M(M_), N(N_), P(P_)
+    DomainDecomposer(int M_, int N_, int P_) : M(M_), N(N_), P(P_) 
     {
-        assert((P & (P - 1)) == 0 && "P must be power of 2!");
+        assert(P > 0 && "P must be positive!");
         block_division();
         part_x = divide_grid_1D(M, px);
         part_y = divide_grid_1D(N, py);
     }
 
     void block_division() {
-        int log2p = std::round(std::log2(P));
-        if (log2p & 1) { 
-            if (M < N) { 
-                px = 1 << (log2p / 2);
-                py = 1 << (log2p / 2 + 1);
-            } else { 
-                px = 1 << (log2p / 2 + 1);
-                py = 1 << (log2p / 2);
+        double best_score = std::numeric_limits<double>::infinity();
+        int best_px = -1, best_py = -1;
+
+        for (int d = 1; d * d <= P; ++d) {
+            if (P % d != 0) continue;
+            int a = d;
+            int b = P / d;
+
+            int cand_px[2] = {a, b};
+            int cand_py[2] = {b, a};
+
+            for (int k = 0; k < 2; ++k) {
+                int tx = cand_px[k];
+                int ty = cand_py[k];
+
+                if (tx <= 0 || ty <= 0) continue;
+                double local_M = static_cast<double>(M) / tx;
+                double local_N = static_cast<double>(N) / ty;
+                if (local_M <= 0.0 || local_N <= 0.0) continue;
+
+                double ratio = local_M / local_N;
+                if (ratio < 0.5 || ratio > 2.0) {
+                    continue;
+                }
+
+                double score = std::fabs(ratio - 1.0);
+                if (score < best_score) {
+                    best_score = score;
+                    best_px = tx;
+                    best_py = ty;
+                }
             }
-        } else {
-            px = 1 << (log2p / 2);
-            py = 1 << (log2p / 2);
         }
+
+
+        if (best_px < 0 || best_py < 0) {
+            int world_rank = 0;
+            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+            if (world_rank == 0) {
+                std::cerr << "Failed to find valid (px, py) for M=" << M
+                      << ", N=" << N << ", P=" << P
+                      << " with subdomain aspect ratio in [1/2, 2].\n";
+            }
+            MPI_Abort(MPI_COMM_WORLD, -1);
+        }
+
+        px = best_px;
+        py = best_py;
     }
 
     std::vector<int> divide_grid_1D(int total_nodes, int blocks) {
