@@ -69,6 +69,7 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
     }
 
     cuda_check_error("cudaMemcpyDeviceToHost in cuda_exchange_halo");
+    cudaStreamSynchronize(stream);
     timer.stop("mem_to_host");
 
     timer.start("mpi_exchange_halo");
@@ -113,6 +114,7 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
     }
 
     cuda_check_error("cudaMemcpyHostToDevice in cuda_exchange_halo");
+    cudaStreamSynchronize(stream);
     timer.stop("mem_to_device");
 }
 
@@ -171,24 +173,28 @@ double MPICudaPoissonSolver::compute_p_Ap() {
 void MPICudaPoissonSolver::update_u(double alpha) {
     timer.start("cuda_update");
     cuda_update_u(d_u, d_p, alpha, M, N, stream);
+    cudaStreamSynchronize(stream);
     timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::update_r(double alpha) {
     timer.start("cuda_update");
     cuda_update_r(d_r, d_A_p, alpha, M, N, stream);
+    cudaStreamSynchronize(stream);
     timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::update_p(double beta) {
     timer.start("cuda_update");
     cuda_update_p(d_p, d_z, beta, M, N, stream);
+    cudaStreamSynchronize(stream);
     timer.stop("cuda_update");
 }
 
 void MPICudaPoissonSolver::apply_preconditioner() {
     timer.start("cuda_update");
     cuda_apply_preconditioner(d_z, d_r, d_M_inv, M, N, stream);
+    cudaStreamSynchronize(stream);
     timer.stop("cuda_update");
 }
 

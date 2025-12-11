@@ -5,11 +5,11 @@
 #include "cuda_kernels.cuh"
 
 #ifndef CUDA_BLOCK_X
-#define CUDA_BLOCK_X 16
+#define CUDA_BLOCK_X 256
 #endif
 
 #ifndef CUDA_BLOCK_Y
-#define CUDA_BLOCK_Y 16
+#define CUDA_BLOCK_Y 1
 #endif
 
 #ifndef THREADS_PER_BLOCK

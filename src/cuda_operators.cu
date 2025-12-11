@@ -27,8 +27,8 @@ void cuda_apply_A(const double *d_v,
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
+        (N + block.x - 1) / block.x,
+        (M + block.y - 1) / block.y
     );
 
     apply_A_kernel<<<grid, block, 0, stream>>>(d_v, d_k, d_out, M, N, hx2, hy2);
@@ -43,8 +43,8 @@ void cuda_update_u(double *d_u,
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
+        (N + block.x - 1) / block.x,
+        (M + block.y - 1) / block.y
     );
 
     update_u_kernel<<<grid, block, 0, stream>>>(d_u, d_p, alpha, M, N);
@@ -59,8 +59,8 @@ void cuda_update_r(double *d_r,
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
+        (N + block.x - 1) / block.x,
+        (M + block.y - 1) / block.y
     );
 
     update_r_kernel<<<grid, block, 0, stream>>>(d_r, d_Ap, alpha, M, N);
@@ -75,8 +75,8 @@ void cuda_update_p(double *d_p,
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
+        (N + block.x - 1) / block.x,
+        (M + block.y - 1) / block.y
     );
 
     update_p_kernel<<<grid, block, 0, stream>>>(d_p, d_z, beta, M, N);
@@ -91,8 +91,8 @@ void cuda_apply_preconditioner(double *d_z,
 {
     dim3 block(CUDA_BLOCK_X, CUDA_BLOCK_Y);
     dim3 grid(
-        (M + block.x - 1) / block.x,
-        (N + block.y - 1) / block.y
+        (N + block.x - 1) / block.x,
+        (M + block.y - 1) / block.y
     );
 
     apply_preconditioner_kernel<<<grid, block, 0, stream>>>(d_z, d_r, d_M_inv, M, N);

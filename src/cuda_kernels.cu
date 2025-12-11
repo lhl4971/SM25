@@ -6,8 +6,8 @@ void apply_A_kernel(const double * __restrict__ v,
                     const double * __restrict__ k,
                     double * __restrict__ out,
                     int M, int N, double hx2, double hy2) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
     
     if (i < 1 || i >= M) return;
     if (j < 1 || j >= N) return;
@@ -42,9 +42,13 @@ void apply_A_kernel(const double * __restrict__ v,
 }
 
 __global__
-void update_u_kernel(double *u, const double *p, double alpha, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
+void update_u_kernel(double* __restrict__ u,
+                     const double* __restrict__ p,
+                     double alpha,
+                     int M, int N)
+{
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
     
     if (i < 1 || i >= M) return;
     if (j < 1 || j >= N) return;
@@ -54,9 +58,13 @@ void update_u_kernel(double *u, const double *p, double alpha, int M, int N) {
 }
 
 __global__
-void update_r_kernel(double *r, const double *A_p, double alpha, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
+void update_r_kernel(double* __restrict__ r,
+                     const double* __restrict__ A_p,
+                     double alpha,
+                     int M, int N)
+{
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
     
     if (i < 1 || i >= M) return;
     if (j < 1 || j >= N) return;
@@ -66,9 +74,13 @@ void update_r_kernel(double *r, const double *A_p, double alpha, int M, int N) {
 }
 
 __global__
-void update_p_kernel(double *p, const double *z, double beta, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
+void update_p_kernel(double* __restrict__ p,
+                     const double* __restrict__ z,
+                     double beta,
+                     int M, int N)
+{
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
     
     if (i < 1 || i >= M) return;
     if (j < 1 || j >= N) return;
@@ -78,9 +90,13 @@ void update_p_kernel(double *p, const double *z, double beta, int M, int N) {
 }
 
 __global__
-void apply_preconditioner_kernel(double *z, const double *r, const double *M_inv,  int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
+void apply_preconditioner_kernel(double* __restrict__ z, 
+                                 const double* __restrict__ r,
+                                 const double* __restrict__ M_inv, 
+                                 int M, int N)
+{
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
     
     if (i < 1 || i >= M) return;
     if (j < 1 || j >= N) return;
