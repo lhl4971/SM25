@@ -35,7 +35,7 @@ MPICudaPoissonSolver::MPICudaPoissonSolver(
     cudaMalloc(&d_p,       size * sizeof(double));
     cudaMalloc(&d_A_p,     size * sizeof(double));
     cudaMalloc(&d_M_inv,   size * sizeof(double));
-    cudaMalloc(&d_buf,     size * sizeof(double));
+    cudaMalloc(&d_partial, NUM_PARTIALS * sizeof(double));
     cuda_check_error("cudaMalloc in MPICudaPoissonSolver ctor");
 }
 
@@ -117,31 +117,14 @@ void MPICudaPoissonSolver::cuda_exchange_halo(double *d_field)
 }
 
 double MPICudaPoissonSolver::compute_l2_norm() {
-    // GPU partial pre-reduction
+    // GPU reduction
     timer.start("cuda_reduce");
-    cuda_compute_r2(d_buf, d_r, M, N, stream);
-    int total = (M + 1) * (N + 1);
-    int len_after = cuda_pairwise_reduce(d_buf, total, NUM_PARTIALS, stream);
-    cudaStreamSynchronize(stream);
+    cuda_reduce_r2_partials(d_partial, d_r, M, N, stream);
+    double local_sum = cuda_reduce_sum(d_partial, NUM_PARTIALS, stream);
     timer.stop("cuda_reduce");
 
-    timer.start("mem_to_host");
-    if (h_partial.size() < len_after)
-        h_partial.resize(len_after);
-
-    cudaMemcpy(h_partial.data(), d_buf, len_after * sizeof(double), cudaMemcpyDeviceToHost);
-    cuda_check_error("compute_l2_norm memcpy");
-    timer.stop("mem_to_host");
-
-    timer.start("reduction");
-    // CPU local post-reduction
-    double local_sum = 0.0;
-    for (int i = 0; i < len_after; i++)
-        local_sum += h_partial[i];
-    timer.stop("reduction");
-
-    timer.start("mpi_allreduce");
     // MPI global reduction
+    timer.start("mpi_allreduce");
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
     timer.stop("mpi_allreduce");
@@ -154,31 +137,14 @@ void MPICudaPoissonSolver::initialize_p() {
 }
 
 double MPICudaPoissonSolver::compute_rz() {
-    // GPU partial pre-reduction
+    // GPU reduction
     timer.start("cuda_reduce");
-    cuda_compute_rz(d_buf, d_r, d_z, M, N, stream);
-    int total = (M + 1) * (N + 1);
-    int len_after = cuda_pairwise_reduce(d_buf, total, NUM_PARTIALS, stream);
-    cudaStreamSynchronize(stream);
+    cuda_reduce_rz_partials(d_partial, d_r, d_z, M, N, stream);
+    double local_sum = cuda_reduce_sum(d_partial, NUM_PARTIALS, stream);
     timer.stop("cuda_reduce");
 
-    timer.start("mem_to_host");
-    if (h_partial.size() < len_after)
-        h_partial.resize(len_after);
-
-    cudaMemcpy(h_partial.data(), d_buf, len_after * sizeof(double), cudaMemcpyDeviceToHost);
-    cuda_check_error("compute_rz_norm memcpy");
-    timer.stop("mem_to_host");
-
-    timer.start("reduction");
-    // CPU local post-reduction
-    double local_sum = 0.0;
-    for (int i = 0; i < len_after; i++)
-        local_sum += h_partial[i];
-    timer.stop("reduction");
-
+    // GPU partial pre-reduction
     timer.start("mpi_allreduce");
-    // MPI global reduction
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
     timer.stop("mpi_allreduce");
@@ -187,31 +153,14 @@ double MPICudaPoissonSolver::compute_rz() {
 }
 
 double MPICudaPoissonSolver::compute_p_Ap() {
-    // GPU partial pre-reduction
+    // GPU reduction
     timer.start("cuda_reduce");
-    cuda_compute_p_Ap(d_buf, d_p, d_A_p, M, N, stream);
-    int total = (M + 1) * (N + 1);
-    int len_after = cuda_pairwise_reduce(d_buf, total, NUM_PARTIALS, stream);
-    cudaStreamSynchronize(stream);
+    cuda_reduce_p_Ap_partials(d_partial, d_p, d_A_p, M, N, stream);
+    double local_sum = cuda_reduce_sum(d_partial, NUM_PARTIALS, stream);
     timer.stop("cuda_reduce");
 
-    timer.start("mem_to_host");
-    if (h_partial.size() < len_after)
-        h_partial.resize(len_after);
-
-    cudaMemcpy(h_partial.data(), d_buf, len_after * sizeof(double), cudaMemcpyDeviceToHost);
-    cuda_check_error("compute_p_Ap_norm memcpy");
-    timer.stop("mem_to_host");
-
-    timer.start("reduction");
-    // CPU local post-reduction
-    double local_sum = 0.0;
-    for (int i = 0; i < len_after; i++)
-        local_sum += h_partial[i];
-    timer.stop("reduction");
-
-    timer.start("mpi_allreduce");
     // MPI global reduction
+    timer.start("mpi_allreduce");
     double global_sum = 0.0;
     MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, cart_comm);
     timer.stop("mpi_allreduce");
@@ -315,7 +264,6 @@ MPICudaPoissonSolver::~MPICudaPoissonSolver() {
     if (d_p)        cudaFree(d_p);
     if (d_A_p)      cudaFree(d_A_p);
     if (d_M_inv)    cudaFree(d_M_inv);
-    if (d_buf)      cudaFree(d_buf);
     if (d_partial)  cudaFree(d_partial);
 
     cudaStreamDestroy(stream);

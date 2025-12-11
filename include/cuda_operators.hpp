@@ -12,12 +12,20 @@
 #define CUDA_BLOCK_Y 16
 #endif
 
-#ifndef NUM_PARTIALS
-#define NUM_PARTIALS 1024
-#endif
-
 #ifndef THREADS_PER_BLOCK
 #define THREADS_PER_BLOCK (CUDA_BLOCK_X * CUDA_BLOCK_Y)
+#endif
+
+#ifndef DOT_BLOCKS
+#define DOT_BLOCKS 128
+#endif
+
+#ifndef DOT_THREADS
+#define DOT_THREADS 256
+#endif
+
+#ifndef NUM_PARTIALS
+#define NUM_PARTIALS (DOT_BLOCKS * DOT_THREADS)
 #endif
 
 void cuda_check_error(const char *msg);
@@ -53,25 +61,26 @@ void cuda_apply_preconditioner(double *d_z,
                                int M, int N,
                                cudaStream_t stream = 0);
 
-void cuda_compute_r2(double *d_buf,
-                     const double *d_r,
-                     int M, int N,
-                     cudaStream_t stream = 0);
+void cuda_reduce_r2_partials(
+        double *d_partial,
+        const double *d_r,
+        int M, int N,
+        cudaStream_t stream = 0);
 
-void cuda_compute_p_Ap(double *d_buf,
-                       const double *d_p,
-                       const double *d_Ap,
-                       int M, int N,
-                       cudaStream_t stream = 0);
+void cuda_reduce_p_Ap_partials(
+        double *d_partial,
+        const double *d_p,
+        const double *d_Ap,
+        int M, int N,
+        cudaStream_t stream = 0);
 
-void cuda_compute_rz(double *d_buf,
-                     const double *d_r,
-                     const double *d_z,
-                     int M, int N,
-                     cudaStream_t stream = 0);
+void cuda_reduce_rz_partials(
+        double *d_partial,
+        const double *d_r,
+        const double *d_z,
+        int M, int N,
+        cudaStream_t stream = 0);
 
-int cuda_pairwise_reduce(double *d_data,
-                         int n, int target_n,
-                         cudaStream_t stream = 0);
+double cuda_reduce_sum(double* d_data, int n, cudaStream_t stream = 0);
 
 #endif // CUDA_OPERATORS_HPP

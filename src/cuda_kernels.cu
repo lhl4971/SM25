@@ -90,59 +90,57 @@ void apply_preconditioner_kernel(double *z, const double *r, const double *M_inv
 }
 
 __global__
-void compute_r2_kernel(double *buf, const double *r, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (i > M || j > N) return;
-    int id = idx(i, j, N + 1);
-
-    if (i < 1 || i >= M || j < 1 || j >= N) {
-        buf[id] = 0.0;
-        return;
-    };
-
-    buf[id] = r[id] * r[id];
-}
-
-__global__
-void compute_p_Ap_kernel(double *buf, const double *p, const double *A_p, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (i > M || j > N) return;
-    int id = idx(i, j, N + 1);
-
-    if (i < 1 || i >= M || j < 1 || j >= N) {
-        buf[id] = 0.0;
-        return;
-    };
-
-    buf[id] = p[id] * A_p[id];
-}
-
-__global__
-void compute_rz_kernel(double *buf, const double *r, const double *z, int M, int N) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (i > M || j > N) return;
-    int id = idx(i, j, N + 1);
-
-    if (i < 1 || i >= M || j < 1 || j >= N) {
-        buf[id] = 0.0;
-        return;
-    };
-
-    buf[id] = r[id] * z[id];
-}
-
-__global__
-void reduce_pairwise_kernel(double *data, int n, int stride) {
+void compute_r2_partials_kernel(double* __restrict__ d_partial,
+                                const double* __restrict__ r,
+                                int total)
+{
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid >= stride) return;
+    int total_threads = blockDim.x * gridDim.x;
+    int stride = blockDim.x * gridDim.x;
 
-    int j = tid + stride;
-    if (j < n)
-        data[tid] += data[j];
+    double sum = 0.0;
+    for (int i = tid; i < total; i += stride) {
+        sum += r[i] * r[i];
+    }
+    if (tid < total_threads) {
+        d_partial[tid] = sum;
+    }
+}
+
+__global__
+void compute_rz_partials_kernel(double* __restrict__ d_partial,
+                                const double* __restrict__ r,
+                                const double* __restrict__ z,
+                                int total)
+{
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    int total_threads = blockDim.x * gridDim.x;
+    int stride = blockDim.x * gridDim.x;
+
+    double sum = 0.0;
+    for (int i = tid; i < total; i += stride) {
+        sum += r[i] * z[i];
+    }
+    if (tid < total_threads) {
+        d_partial[tid] = sum;
+    }
+}
+
+__global__
+void compute_p_Ap_partials_kernel(double* __restrict__ d_partial,
+                                  const double* __restrict__ p,
+                                  const double* __restrict__ Ap,
+                                  int total)
+{
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    int total_threads = blockDim.x * gridDim.x;
+    int stride = blockDim.x * gridDim.x;
+
+    double sum = 0.0;
+    for (int i = tid; i < total; i += stride) {
+        sum += p[i] * Ap[i];
+    }
+    if (tid < total_threads) {
+        d_partial[tid] = sum;
+    }
 }
