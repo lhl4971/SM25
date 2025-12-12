@@ -1,0 +1,8 @@
+#BSUB -n 20
+#BSUB -W 30
+#BSUB -J mpi_800_1200_20
+#BSUB -oo "log/stage_9/mpi_800_1200_20_cout.log"
+#BSUB -eo "log/stage_9/mpi_800_1200_20_cerr.log"
+#BSUB -R "span[hosts=1]"
+
+mpiexec ./task_mpi 800 1200

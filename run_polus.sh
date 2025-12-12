@@ -309,36 +309,40 @@ if [ ${stage} -le 8 ] && [ ${stop_stage} -ge 8 ]; then
 fi
 
 # ============================================================
-# Stage 9: MPI+CUDA GPU tests using pre-written LSF scripts
+# Stage 9: Run pre-written LSF scripts (MPI / MPI+OMP / MPI+CUDA)
 # ============================================================
 if [ ${stage} -le 9 ] && [ ${stop_stage} -ge 9 ]; then
-  echo "=============== Stage 9: MPI+CUDA GPU test ==============="
+  echo "=============== Stage 9: LSF batch runs ==============="
 
   mkdir -p log/stage_9
 
   echo "[Compile] Building MPI+CUDA version..."
   make ARCH=sm_60
 
-  for PROCS in 1 2 4; do
-    JOB_NAME="mpi_cuda_400_600_g${PROCS}"
-    LSF_FILE="config/stage_9/${JOB_NAME}.lsf"
-    echo "---- Submitting job via ${LSF_FILE} ----"
+  SIZES=("800 1200" "1600 2400" "3200 4800")
 
-    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
-    echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
-    bwait -w "ended(${JOB_ID})"
-    echo "[INFO] Job ${JOB_ID} finished."
-  done
+  for SIZE in "${SIZES[@]}"; do
+    set -- ${SIZE}
+    M=$1
+    N=$2
 
-  for PROCS in 1 2 4; do
-    JOB_NAME="mpi_cuda_800_1200_g${PROCS}"
-    LSF_FILE="config/stage_9/${JOB_NAME}.lsf"
-    echo "---- Submitting job via ${LSF_FILE} ----"
+    echo "================== Size: ${M}x${N} =================="
 
-    JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
-    echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
-    bwait -w "ended(${JOB_ID})"
-    echo "[INFO] Job ${JOB_ID} finished."
+    LSF_LIST=(
+      "config/stage_9/mpi_${M}_${N}_20.lsf"
+      "config/stage_9/mpi_omp_${M}_${N}_20_8.lsf"
+      "config/stage_9/mpi_cuda_${M}_${N}_g1.lsf"
+      "config/stage_9/mpi_cuda_${M}_${N}_g2.lsf"
+    )
+
+    for LSF_FILE in "${LSF_LIST[@]}"; do
+      echo "---- Submitting job via ${LSF_FILE} ----"
+
+      JOB_ID=$(bsub < "${LSF_FILE}" | awk '{print $2}' | tr -d '<>')
+      echo "[INFO] Job ${JOB_ID} submitted, waiting for it to complete..."
+      bwait -w "ended(${JOB_ID})"
+      echo "[INFO] Job ${JOB_ID} finished."
+    done
   done
 fi
 

@@ -1,0 +1,93 @@
+Sender: LSF System <lsfadmin@polus-c2-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1439081: <mpi_omp_3200_4800_20_8> in cluster <MSUCluster> Done
+
+Job <mpi_omp_3200_4800_20_8> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec 12 05:35:10 2025
+Job was executed on host(s) <20*polus-c2-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec 12 05:35:11 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec 12 05:35:11 2025
+Terminated at Fri Dec 12 05:40:32 2025
+Results reported at Fri Dec 12 05:40:32 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -n 20
+#BSUB -W 30
+#BSUB -J mpi_omp_3200_4800_20_8
+#BSUB -oo "log/stage_9/mpi_omp_3200_4800_20_8_cout.log"
+#BSUB -eo "log/stage_9/mpi_omp_3200_4800_20_8_cerr.log"
+#BSUB -R "span[hosts=1]"
+
+export OMP_NUM_THREADS=8
+export OMP_PROC_BIND=true
+export OMP_PLACES=cores
+
+mpiexec ./task_mpi_omp 3200 4800
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   46486.50 sec.
+    Max Memory :                                 3016 MB
+    Average Memory :                             2629.81 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              24
+    Max Threads :                                229
+    Run time :                                   320 sec.
+    Turnaround time :                            322 sec.
+
+The output (if any) follows:
+
+==== Domain Decomposition Summary ====
+Global grid: 3200 x 4800
+Total processes: 20    Grid layout: 4 x 5
+X partitions (4):    0 80016002400
+Y partitions (5):    0 960192028803840
+======================================
+[Rank  5] coords=(1,0) x:[ 800,1599] y:[   0, 959] 
+[Rank 15] coords=(3,0) x:[2400,3200] y:[   0, 959] 
+[Rank 11] coords=(2,1) x:[1600,2399] y:[ 960,1919] 
+[Rank  4] coords=(0,4) x:[   0, 799] y:[3840,4800] 
+[Rank  9] coords=(1,4) x:[ 800,1599] y:[3840,4800] 
+[Rank  6] coords=(1,1) x:[ 800,1599] y:[ 960,1919] 
+[Rank  3] coords=(0,3) x:[   0, 799] y:[2880,3839] 
+[Rank  2] coords=(0,2) x:[   0, 799] y:[1920,2879] 
+[Rank 14] coords=(2,4) x:[1600,2399] y:[3840,4800] 
+[Rank 17] coords=(3,2) x:[2400,3200] y:[1920,2879] 
+[Rank 10] coords=(2,0) x:[1600,2399] y:[   0, 959] 
+[Rank  1] coords=(0,1) x:[   0, 799] y:[ 960,1919] 
+[Rank 18] coords=(3,3) x:[2400,3200] y:[2880,3839] 
+[Rank 19] coords=(3,4) x:[2400,3200] y:[3840,4800] 
+[Rank 12] coords=(2,2) x:[1600,2399] y:[1920,2879] 
+[Rank 13] coords=(2,3) x:[1600,2399] y:[2880,3839] 
+[Rank 16] coords=(3,1) x:[2400,3200] y:[ 960,1919] 
+[Rank  7] coords=(1,2) x:[ 800,1599] y:[1920,2879] 
+[Rank  8] coords=(1,3) x:[ 800,1599] y:[2880,3839] 
+[Rank  0] coords=(0,0) x:[   0, 799] y:[   0, 959] 
+[OK] Converged in 16024 iterations, residual = 9.98456e-05
+Saved solution to solution/solution_M_3200_N_4800.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.264907 sec
+Laplace operator time      = 100.43 sec
+Update operator time       = 116.319 sec
+Local reduction time       = 57.6014 sec
+MPI halo exchange time     = 3.76349 sec
+MPI Allreduce time         = 31.7323 sec
+Finalize                   = 8.76603 sec
+Total runtime              = 319.48 sec
+===============================================
+
+
+
+PS:
+
+Read file <log/stage_9/mpi_omp_3200_4800_20_8_cerr.log> for stderr output of this job.
+

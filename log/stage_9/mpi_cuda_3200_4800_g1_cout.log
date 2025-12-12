@@ -1,0 +1,76 @@
+Sender: LSF System <lsfadmin@polus-c2-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1439082: <mpi_cuda_3200_4800_g1> in cluster <MSUCluster> Done
+
+Job <mpi_cuda_3200_4800_g1> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec 12 05:40:32 2025
+Job was executed on host(s) <polus-c2-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec 12 05:40:32 2025
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
+</home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
+Started at Fri Dec 12 05:40:32 2025
+Terminated at Fri Dec 12 05:42:02 2025
+Results reported at Fri Dec 12 05:42:02 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -n 1
+#BSUB -W 30
+#BSUB -J "mpi_cuda_3200_4800_g1"
+#BSUB -oo "log/stage_9/mpi_cuda_3200_4800_g1_cout.log"
+#BSUB -eo "log/stage_9/mpi_cuda_3200_4800_g1_cerr.log"
+#BSUB -gpu "num=1:mode=exclusive_process"
+
+mpiexec ./task_mpi_cuda 3200 4800
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   88.95 sec.
+    Max Memory :                                 1629 MB
+    Average Memory :                             1193.60 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                15
+    Run time :                                   89 sec.
+    Turnaround time :                            90 sec.
+
+The output (if any) follows:
+
+[Rank 0] host=polus-c2-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=1
+==== Domain Decomposition Summary ====
+Global grid: 3200 x 4800
+Total processes: 1    Grid layout: 1 x 1
+X partitions (1):    0
+Y partitions (1):    0
+======================================
+[Rank  0] coords=(0,0) x:[   0,3200] y:[   0,4800] 
+[OK] Converged in 16441 iterations, residual = 9.92599e-05
+Saved solution to solution/solution_M_3200_N_4800.csv
+
+
+===== Timing Summary (rank 0, accumulated) =====
+Initialization time        = 0.898709 sec
+CPU Laplace operator time  = 0.21428 sec
+CPU update time            = 0.286444 sec
+CPU local reduction time   = 0 sec
+CUDA Laplace operator time = 13.3782 sec
+CUDA update (kernels) time = 44.3312 sec
+CUDA reduction kernels time= 20.4243 sec
+Host->Device memcpy time   = 0.0974186 sec
+Device->Host memcpy time   = 0.0926227 sec
+MPI halo exchange time     = 0.0208896 sec
+MPI Allreduce time         = 0.0761886 sec
+Finalize time              = 9.15794 sec
+Total runtime              = 88.8233 sec
+===============================================
+
+
+
+PS:
+
+Read file <log/stage_9/mpi_cuda_3200_4800_g1_cerr.log> for stderr output of this job.
+

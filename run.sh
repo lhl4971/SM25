@@ -186,15 +186,14 @@ if [ ${stage} -le 9 ] && [ ${stop_stage} -ge 9 ]; then
   echo "[Compile] Building MPI+CUDA version..."
   make ARCH=sm_90
 
-  for PROCS in 1; do
-    echo "---- MPI Processes: ${PROCS}, Grid: 400x600 ----"
-    mpirun -np ${PROCS} ./task_mpi_cuda 400 600
-  done
+  echo "---- MPI Processes: 1, Grid: 800x1200 ----"
+  mpirun -np 1 ./task_mpi_cuda 800 1200
 
-  for PROCS in 1; do
-    echo "---- MPI Processes: ${PROCS}, Grid: 800x1200 ----"
-    mpirun -np ${PROCS} ./task_mpi_cuda 800 1200
-  done
+  echo "---- MPI Processes: 1, Grid: 1600x2400 ----"
+  mpirun -np 1 ./task_mpi_cuda 1600 2400
+
+  echo "---- MPI Processes: 1, Grid: 3200x4800 ----"
+  mpirun -np 1 ./task_mpi_cuda 3200 4800
 fi
 
 # ============================================================

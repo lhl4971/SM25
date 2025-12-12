@@ -1,13 +1,13 @@
-Sender: LSF System <lsfadmin@polus-c3-ib.bmc.hpc.cs.msu.ru>
-Subject: Job 1427189: <mpi_cuda_800_1200_g1> in cluster <MSUCluster> Done
+Sender: LSF System <lsfadmin@polus-c2-ib.bmc.hpc.cs.msu.ru>
+Subject: Job 1439074: <mpi_cuda_800_1200_g1> in cluster <MSUCluster> Done
 
-Job <mpi_cuda_800_1200_g1> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 22:17:46 2025
-Job was executed on host(s) <polus-c3-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Mon Dec  8 22:17:46 2025
+Job <mpi_cuda_800_1200_g1> was submitted from host <polus-ib.bmc.hpc.cs.msu.ru> by user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec 12 05:27:45 2025
+Job was executed on host(s) <polus-c2-ib.bmc.hpc.cs.msu.ru>, in queue <short>, as user <edu-cmc-skmodel25-619-2-08> in cluster <MSUCluster> at Fri Dec 12 05:27:45 2025
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08> was used as the home directory.
 </home_edu/edu-cmc-skmodel25-619-2/edu-cmc-skmodel25-619-2-08/supercomputer> was used as the working directory.
-Started at Mon Dec  8 22:17:46 2025
-Terminated at Mon Dec  8 22:17:53 2025
-Results reported at Mon Dec  8 22:17:53 2025
+Started at Fri Dec 12 05:27:45 2025
+Terminated at Fri Dec 12 05:27:49 2025
+Results reported at Fri Dec 12 05:27:49 2025
 
 Your job looked like:
 
@@ -17,7 +17,7 @@ Your job looked like:
 #BSUB -W 30
 #BSUB -J "mpi_cuda_800_1200_g1"
 #BSUB -oo "log/stage_9/mpi_cuda_800_1200_g1_cout.log"
-#BSUB -eo "log/stage_9/mpi_cuda_4800_1200_g1_cerr.log"
+#BSUB -eo "log/stage_9/mpi_cuda_800_1200_g1_cerr.log"
 #BSUB -gpu "num=1:mode=exclusive_process"
 
 mpiexec ./task_mpi_cuda 800 1200
@@ -27,7 +27,7 @@ Successfully completed.
 
 Resource usage summary:
 
-    CPU time :                                   5.71 sec.
+    CPU time :                                   2.72 sec.
     Max Memory :                                 177 MB
     Average Memory :                             119.33 MB
     Total Requested Memory :                     -
@@ -35,12 +35,12 @@ Resource usage summary:
     Max Swap :                                   -
     Max Processes :                              5
     Max Threads :                                15
-    Run time :                                   6 sec.
-    Turnaround time :                            7 sec.
+    Run time :                                   3 sec.
+    Turnaround time :                            4 sec.
 
 The output (if any) follows:
 
-[Rank 0] host=polus-c3-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=1
+[Rank 0] host=polus-c2-ib.bmc.hpc.cs.msu.ru local_rank=0 dev=0 dev_count=1
 ==== Domain Decomposition Summary ====
 Global grid: 800 x 1200
 Total processes: 1    Grid layout: 1 x 1
@@ -53,24 +53,24 @@ Saved solution to solution/solution_M_800_N_1200.csv
 
 
 ===== Timing Summary (rank 0, accumulated) =====
-Initialization time        = 0.311209 sec
-CPU Laplace operator time  = 0.0273536 sec
-CPU update time            = 0.0388397 sec
-CPU local reduction time   = 0.0459182 sec
-CUDA Laplace operator time = 0.506891 sec
-CUDA update (kernels) time = 0.161038 sec
-CUDA reduction kernels time= 2.73272 sec
-Host->Device memcpy time   = 0.011966 sec
-Device->Host memcpy time   = 0.248178 sec
-MPI halo exchange time     = 0.00910631 sec
-MPI Allreduce time         = 0.0300079 sec
-Finalize time              = 0.970008 sec
-Total runtime              = 5.63806 sec
+Initialization time        = 0.233743 sec
+CPU Laplace operator time  = 0.0133958 sec
+CPU update time            = 0.0180588 sec
+CPU local reduction time   = 0 sec
+CUDA Laplace operator time = 0.241249 sec
+CUDA update (kernels) time = 0.75644 sec
+CUDA reduction kernels time= 0.723096 sec
+Host->Device memcpy time   = 0.0165845 sec
+Device->Host memcpy time   = 0.0158908 sec
+MPI halo exchange time     = 0.00451361 sec
+MPI Allreduce time         = 0.0165013 sec
+Finalize time              = 0.584233 sec
+Total runtime              = 2.6692 sec
 ===============================================
 
 
 
 PS:
 
-Read file <log/stage_9/mpi_cuda_4800_1200_g1_cerr.log> for stderr output of this job.
+Read file <log/stage_9/mpi_cuda_800_1200_g1_cerr.log> for stderr output of this job.
 

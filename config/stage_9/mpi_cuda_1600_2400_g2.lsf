@@ -1,0 +1,9 @@
+#BSUB -n 2
+#BSUB -W 30
+#BSUB -J "mpi_cuda_1600_2400_g2"
+#BSUB -oo "log/stage_9/mpi_cuda_1600_2400_g2_cout.log"
+#BSUB -eo "log/stage_9/mpi_cuda_1600_2400_g2_cerr.log"
+#BSUB -R "span[ptile=2]"
+#BSUB -gpu "num=2:mode=exclusive_process"
+
+mpiexec ./task_mpi_cuda 1600 2400

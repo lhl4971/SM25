@@ -1,0 +1,12 @@
+#BSUB -n 20
+#BSUB -W 30
+#BSUB -J mpi_omp_1600_2400_20_8
+#BSUB -oo "log/stage_9/mpi_omp_1600_2400_20_8_cout.log"
+#BSUB -eo "log/stage_9/mpi_omp_1600_2400_20_8_cerr.log"
+#BSUB -R "span[hosts=1]"
+
+export OMP_NUM_THREADS=8
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+
+mpiexec ./task_mpi_omp 1600 2400
